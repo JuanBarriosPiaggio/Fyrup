@@ -19,7 +19,13 @@ export const metadata: Metadata = {
   description: "With over 15 years of experience, Fyrup delivers exceptional fire protection services including fire risk assessments, fire stopping, fire doors, and fire dampers across London.",
   keywords: "fire protection, fire risk assessment, fire stopping, fire doors, fire dampers, London",
   icons: {
-    icon: '/logo.png',
+    icon: [
+      { url: '/logo.png' },
+      { url: '/logo.png', sizes: '16x16', type: 'image/png' },
+      { url: '/logo.png', sizes: '32x32', type: 'image/png' },
+    ],
+    shortcut: '/logo.png',
+    apple: '/logo.png',
   },
   openGraph: {
     title: "Fyrup | Leading Provider of Passive Fire Protection",
@@ -40,6 +46,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <link rel="icon" href="/logo.png" type="image/png" />
+      </head>
       <body className={`${inter.variable} ${playfair.variable} antialiased`}>
         <Header />
         <main>{children}</main>
