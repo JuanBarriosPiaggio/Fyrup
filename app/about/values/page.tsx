@@ -134,15 +134,15 @@ export default function ValuesPage() {
                         Partner with a fire protection company that puts integrity and excellence first.
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Link 
-                            href="/contact" 
+                        <Link
+                            href="/contact"
                             className="inline-flex items-center justify-center bg-primary-600 text-white px-10 py-5 text-lg font-bold uppercase tracking-wide hover:bg-primary-700 transition-all shadow-2xl"
                         >
                             Get In Touch
                             <ArrowRight className="ml-3 h-6 w-6" />
                         </Link>
-                        <a 
-                            href="tel:02035762292" 
+                        <a
+                            href="tel:02035762292"
                             className="inline-flex items-center justify-center border-4 border-white text-white px-10 py-5 text-lg font-bold uppercase tracking-wide hover:bg-white hover:text-dark-900 transition-all"
                         >
                             Call 020 3576 2292
