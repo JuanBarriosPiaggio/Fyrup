@@ -10,7 +10,7 @@ export default function Home() {
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-dark-900/85"></div>
           <img 
-            src="https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1920&q=80" 
+            src="/hero section.png" 
             alt="Fire inspection and property protection"
             className="w-full h-full object-cover"
           />
