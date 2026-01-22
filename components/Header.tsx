@@ -113,40 +113,40 @@ export default function Header() {
       {mobileMenuOpen && (
         <div className="lg:hidden bg-dark-800">
           <div className="px-4 py-6 space-y-4">
-            <Link href="/" className="block py-2 text-white hover:text-primary-500 font-semibold uppercase">
+            <Link href="/" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white hover:text-primary-500 font-semibold uppercase">
               Home
             </Link>
             
             <div className="space-y-2">
               <div className="text-white font-semibold py-2 uppercase">About</div>
-              <Link href="/about/values" className="block py-2 pl-4 text-gray-300 hover:text-primary-500">
+              <Link href="/about/values" onClick={() => setMobileMenuOpen(false)} className="block py-2 pl-4 text-gray-300 hover:text-primary-500">
                 Our Values
               </Link>
-              <Link href="/about/guarantee" className="block py-2 pl-4 text-gray-300 hover:text-primary-500">
+              <Link href="/about/guarantee" onClick={() => setMobileMenuOpen(false)} className="block py-2 pl-4 text-gray-300 hover:text-primary-500">
                 Our Guarantee
               </Link>
             </div>
 
             <div className="space-y-2">
               <div className="text-white font-semibold py-2 uppercase">Services</div>
-              <Link href="/services/fire-risk-assessments" className="block py-2 pl-4 text-gray-300 hover:text-primary-500">
+              <Link href="/services/fire-risk-assessments" onClick={() => setMobileMenuOpen(false)} className="block py-2 pl-4 text-gray-300 hover:text-primary-500">
                 Fire Risk Assessments
               </Link>
-              <Link href="/services/fire-stopping" className="block py-2 pl-4 text-gray-300 hover:text-primary-500">
+              <Link href="/services/fire-stopping" onClick={() => setMobileMenuOpen(false)} className="block py-2 pl-4 text-gray-300 hover:text-primary-500">
                 Fire Stopping
               </Link>
-              <Link href="/services/fire-doors" className="block py-2 pl-4 text-gray-300 hover:text-primary-500">
+              <Link href="/services/fire-doors" onClick={() => setMobileMenuOpen(false)} className="block py-2 pl-4 text-gray-300 hover:text-primary-500">
                 Fire Doors
               </Link>
-              <Link href="/services/fire-dampers" className="block py-2 pl-4 text-gray-300 hover:text-primary-500">
+              <Link href="/services/fire-dampers" onClick={() => setMobileMenuOpen(false)} className="block py-2 pl-4 text-gray-300 hover:text-primary-500">
                 Fire Dampers
               </Link>
             </div>
 
-            <Link href="/contact" className="block py-2 text-white hover:text-primary-500 font-semibold uppercase">
+            <Link href="/contact" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white hover:text-primary-500 font-semibold uppercase">
               Contact
             </Link>
-            <Link href="/faqs" className="block py-2 text-white hover:text-primary-500 font-semibold uppercase">
+            <Link href="/faqs" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white hover:text-primary-500 font-semibold uppercase">
               FAQs
             </Link>
 
@@ -155,7 +155,8 @@ export default function Header() {
                 020 3576 2292
               </a>
               <Link 
-                href="/contact" 
+                href="/contact"
+                onClick={() => setMobileMenuOpen(false)}
                 className="block text-center bg-primary-600 text-white px-6 py-3 font-bold uppercase"
               >
                 Get Quote

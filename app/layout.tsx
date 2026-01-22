@@ -26,6 +26,11 @@ export const metadata: Metadata = {
     description: "Expert fire protection services in London with over 15 years of experience",
     type: "website",
   },
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+  },
 };
 
 export default function RootLayout({
