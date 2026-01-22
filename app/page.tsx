@@ -103,85 +103,87 @@ export default function Home() {
             </p>
           </div>
 
-          <form className="max-w-2xl mx-auto space-y-6 bg-white p-8 md:p-12 shadow-xl">
-            <div className="grid md:grid-cols-2 gap-6">
+          <form className="max-w-2xl mx-auto bg-gray-100 p-10 border-l-8 border-primary-600 shadow-lg">
+            <div className="space-y-6">
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-bold text-dark-900 mb-2 uppercase">First Name</label>
+                  <input 
+                    type="text" 
+                    className="w-full px-4 py-3 border-2 border-gray-300 focus:border-primary-600 focus:outline-none text-dark-900 bg-white font-medium"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-dark-900 mb-2 uppercase">Last Name</label>
+                  <input 
+                    type="text" 
+                    className="w-full px-4 py-3 border-2 border-gray-300 focus:border-primary-600 focus:outline-none text-dark-900 bg-white font-medium"
+                    required
+                  />
+                </div>
+              </div>
+
               <div>
-                <label className="block text-sm font-bold text-dark-900 mb-2 uppercase">First Name</label>
+                <label className="block text-sm font-bold text-dark-900 mb-2 uppercase">Company</label>
                 <input 
                   type="text" 
-                  className="w-full px-4 py-4 border-2 border-gray-300 focus:border-primary-600 focus:ring-0 text-dark-900 bg-white font-medium"
-                  required
+                  className="w-full px-4 py-3 border-2 border-gray-300 focus:border-primary-600 focus:outline-none text-dark-900 bg-white font-medium"
                 />
               </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div>
+                  <label className="block text-sm font-bold text-dark-900 mb-2 uppercase">Email</label>
+                  <input 
+                    type="email" 
+                    className="w-full px-4 py-3 border-2 border-gray-300 focus:border-primary-600 focus:outline-none text-dark-900 bg-white font-medium"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-dark-900 mb-2 uppercase">Phone</label>
+                  <input 
+                    type="tel" 
+                    className="w-full px-4 py-3 border-2 border-gray-300 focus:border-primary-600 focus:outline-none text-dark-900 bg-white font-medium"
+                    required
+                  />
+                </div>
+              </div>
+
               <div>
-                <label className="block text-sm font-bold text-dark-900 mb-2 uppercase">Last Name</label>
+                <label className="block text-sm font-bold text-dark-900 mb-2 uppercase">Inspection Address</label>
                 <input 
                   type="text" 
-                  className="w-full px-4 py-4 border-2 border-gray-300 focus:border-primary-600 focus:ring-0 text-dark-900 bg-white font-medium"
+                  className="w-full px-4 py-3 border-2 border-gray-300 focus:border-primary-600 focus:outline-none text-dark-900 bg-white font-medium"
                   required
                 />
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-bold text-dark-900 mb-2 uppercase">Company</label>
-              <input 
-                type="text" 
-                className="w-full px-4 py-4 border-2 border-gray-300 focus:border-primary-600 focus:ring-0 text-dark-900 bg-white font-medium"
-              />
-            </div>
-
-            <div className="grid md:grid-cols-2 gap-6">
               <div>
-                <label className="block text-sm font-bold text-dark-900 mb-2 uppercase">Email</label>
+                <label className="block text-sm font-bold text-dark-900 mb-2 uppercase">Number of doors needing inspection</label>
                 <input 
-                  type="email" 
-                  className="w-full px-4 py-4 border-2 border-gray-300 focus:border-primary-600 focus:ring-0 text-dark-900 bg-white font-medium"
+                  type="number" 
+                  className="w-full px-4 py-3 border-2 border-gray-300 focus:border-primary-600 focus:outline-none text-dark-900 bg-white font-medium"
                   required
                 />
               </div>
+
               <div>
-                <label className="block text-sm font-bold text-dark-900 mb-2 uppercase">Phone</label>
-                <input 
-                  type="tel" 
-                  className="w-full px-4 py-4 border-2 border-gray-300 focus:border-primary-600 focus:ring-0 text-dark-900 bg-white font-medium"
-                  required
-                />
+                <label className="block text-sm font-bold text-dark-900 mb-2 uppercase">Message</label>
+                <textarea 
+                  rows={4}
+                  className="w-full px-4 py-3 border-2 border-gray-300 focus:border-primary-600 focus:outline-none text-dark-900 bg-white font-medium"
+                ></textarea>
               </div>
-            </div>
 
-            <div>
-              <label className="block text-sm font-bold text-dark-900 mb-2 uppercase">Inspection Address</label>
-              <input 
-                type="text" 
-                className="w-full px-4 py-4 border-2 border-gray-300 focus:border-primary-600 focus:ring-0 text-dark-900 bg-white font-medium"
-                required
-              />
+              <button 
+                type="submit"
+                className="w-full bg-primary-600 text-white px-8 py-5 text-lg font-bold uppercase tracking-wide hover:bg-primary-700 transition-all shadow-xl"
+              >
+                Send Inquiry
+              </button>
             </div>
-
-            <div>
-              <label className="block text-sm font-bold text-dark-900 mb-2 uppercase">Number of doors needing inspection</label>
-              <input 
-                type="number" 
-                className="w-full px-4 py-4 border-2 border-gray-300 focus:border-primary-600 focus:ring-0 text-dark-900 bg-white font-medium"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-sm font-bold text-dark-900 mb-2 uppercase">Message</label>
-              <textarea 
-                rows={4}
-                className="w-full px-4 py-4 border-2 border-gray-300 focus:border-primary-600 focus:ring-0 text-dark-900 bg-white font-medium"
-              ></textarea>
-            </div>
-
-            <button 
-              type="submit"
-              className="w-full bg-primary-600 text-white px-8 py-5 text-lg font-bold uppercase tracking-wide hover:bg-primary-700 transition-all shadow-lg"
-            >
-              Send Inquiry
-            </button>
           </form>
 
           <p className="text-center text-gray-600 mt-8 font-medium">
