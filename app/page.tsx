@@ -164,6 +164,7 @@ export default function Home() {
                 <label className="block text-sm font-bold text-dark-900 mb-2 uppercase">Number of doors needing inspection</label>
                 <input 
                   type="number" 
+                  min="0"
                   className="w-full px-4 py-3 border-2 border-gray-300 focus:border-primary-600 focus:outline-none text-dark-900 bg-white font-medium"
                   required
                 />
