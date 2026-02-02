@@ -1,0 +1,392 @@
+{
+  "name": "Simpro Quote Follow-up Sequence",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * *"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Schedule Trigger (9 AM Daily)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://fyrup.simprosuite.com/api/v1.0/companies/0/quotes/?pageSize=250&columns=ID,Description,DateIssued,Status,Customer,CustomerContact,Total",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "headerAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "usingFieldsBelow",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-quotes",
+      "name": "Get All Quotes",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [450, 300],
+      "credentials": {
+        "headerAuth": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "Fyrup Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter quotes for follow-up based on days since issued\n// Day 3, 7, 14, or 21 after DateIssued\nconst today = new Date();\ntoday.setHours(0, 0, 0, 0); // Normalize to midnight\n\nconst followUpGroups = {\n  day3: [],\n  day7: [],\n  day14: [],\n  day21: []\n};\n\nfor (const quote of $input.all()) {\n  const quoteData = quote.json;\n  \n  // Skip if no DateIssued\n  if (!quoteData.DateIssued) continue;\n  \n  // Extract status - handle if it's an object or string\n  let statusValue = '';\n  if (quoteData.Status) {\n    if (typeof quoteData.Status === 'object') {\n      statusValue = (quoteData.Status.Name || quoteData.Status.name || '').toString().toLowerCase();\n    } else {\n      statusValue = quoteData.Status.toString().toLowerCase();\n    }\n  }\n  \n  // Only process open/pending quotes (not accepted, declined, or expired)\n  if (statusValue.includes('accept') || statusValue.includes('decline') || statusValue.includes('lost') || statusValue.includes('complete')) {\n    continue;\n  }\n  \n  // Calculate days since issued\n  const issueDate = new Date(quoteData.DateIssued);\n  issueDate.setHours(0, 0, 0, 0);\n  \n  const diffTime = today - issueDate;\n  const daysSinceIssued = Math.floor(diffTime / (1000 * 60 * 60 * 24));\n  \n  // Extract customer ID\n  const customerID = quoteData.Customer?.ID || quoteData.Customer;\n  \n  if (!customerID) continue;\n  \n  // Categorize by follow-up day\n  const quoteInfo = {\n    quoteID: quoteData.ID,\n    customerID: customerID,\n    customerHref: null,\n    daysSinceIssued: daysSinceIssued,\n    dateIssued: quoteData.DateIssued,\n    status: statusValue || 'Unknown',\n    description: quoteData.Description || 'No description',\n    total: quoteData.Total\n  };\n  \n  if (daysSinceIssued === 3) {\n    followUpGroups.day3.push({ json: { ...quoteInfo, followUpType: 'day3' } });\n  } else if (daysSinceIssued === 7) {\n    followUpGroups.day7.push({ json: { ...quoteInfo, followUpType: 'day7' } });\n  } else if (daysSinceIssued === 14) {\n    followUpGroups.day14.push({ json: { ...quoteInfo, followUpType: 'day14' } });\n  } else if (daysSinceIssued === 21) {\n    followUpGroups.day21.push({ json: { ...quoteInfo, followUpType: 'day21' } });\n  }\n}\n\n// Combine all groups\nconst allFollowUps = [\n  ...followUpGroups.day3,\n  ...followUpGroups.day7,\n  ...followUpGroups.day14,\n  ...followUpGroups.day21\n];\n\nreturn allFollowUps;"
+      },
+      "id": "filter-followups",
+      "name": "Filter Quotes for Follow-up",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://fyrup.simprosuite.com/api/v1.0/companies/0/customers/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "headerAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "usingFieldsBelow",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-customers",
+      "name": "Get All Customers",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [850, 300],
+      "credentials": {
+        "headerAuth": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "Fyrup Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Match quotes with customer _href URLs\nconst quotes = $('Filter Quotes for Follow-up').all();\nconst customers = $('Get All Customers').all();\n\n// Create customer ID to _href map\nconst customerMap = {};\nfor (const customer of customers) {\n  const custData = customer.json;\n  if (custData.ID && custData._href) {\n    customerMap[custData.ID] = custData._href;\n  }\n}\n\n// Add _href to each quote\nconst quotesWithHrefs = [];\nfor (const quote of quotes) {\n  const quoteData = quote.json;\n  const customerHref = customerMap[quoteData.customerID];\n  \n  if (customerHref) {\n    quotesWithHrefs.push({\n      json: {\n        ...quoteData,\n        customerHref: customerHref\n      }\n    });\n  }\n}\n\nreturn quotesWithHrefs;"
+      },
+      "id": "match-hrefs",
+      "name": "Match Customer HREFs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://fyrup.simprosuite.com{{ $json.customerHref }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "headerAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "usingFieldsBelow",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-customer-details",
+      "name": "Get Customer Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1250, 300],
+      "credentials": {
+        "headerAuth": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "Fyrup Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Merge customer email with quote data\nconst customerDetails = $input.item.json;\nconst quoteData = $('Match Customer HREFs').item.json;\n\n// Get email from customer details\nconst customerEmail = customerDetails.Email;\n\nif (!customerEmail || customerEmail.trim() === '') {\n  return [];\n}\n\nreturn [{\n  json: {\n    ...quoteData,\n    customerEmail: customerEmail,\n    customerName: customerDetails.CompanyName || `${customerDetails.GivenName} ${customerDetails.FamilyName}`.trim()\n  }\n}];"
+      },
+      "id": "prepare-email",
+      "name": "Prepare Email Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.followUpType }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "day3",
+              "output": 0
+            },
+            {
+              "value2": "day7",
+              "output": 1
+            },
+            {
+              "value2": "day14",
+              "output": 2
+            },
+            {
+              "value2": "day21",
+              "output": 3
+            }
+          ]
+        }
+      },
+      "id": "switch-day",
+      "name": "Switch by Follow-up Day",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 2,
+      "position": [1650, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-email@example.com",
+        "toEmail": "={{ $json.customerEmail }}",
+        "subject": "=Quick Check-in on Quote #{{ $json.quoteID }}",
+        "emailType": "html",
+        "message": "=<p>Hi {{ $json.customerName }},</p>\n\n<p>I wanted to quickly check in on the quote we sent you a few days ago.</p>\n\n<p><strong>Quote Details:</strong></p>\n<ul>\n  <li>Quote ID: {{ $json.quoteID }}</li>\n  <li>Date Issued: {{ $json.dateIssued }}</li>\n</ul>\n\n<p>Do you have any questions or need any clarification? I'm here to help!</p>\n\n<p>Best regards,<br>Your Team</p>",
+        "options": {}
+      },
+      "id": "send-day3-email",
+      "name": "Send Day 3 Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1850, 200],
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-email@example.com",
+        "toEmail": "={{ $json.customerEmail }}",
+        "subject": "=Ready to Move Forward? Quote #{{ $json.quoteID }}",
+        "emailType": "html",
+        "message": "=<p>Hi {{ $json.customerName }},</p>\n\n<p>It's been a week since we sent over your quote. We'd love to help you get started!</p>\n\n<p><strong>Quote Details:</strong></p>\n<ul>\n  <li>Quote ID: {{ $json.quoteID }}</li>\n  <li>Date Issued: {{ $json.dateIssued }}</li>\n</ul>\n\n<p><strong>Would you like to accept this quote and move forward?</strong></p>\n\n<p>If you have any questions or concerns, please don't hesitate to reach out.</p>\n\n<p>Best regards,<br>Your Team</p>",
+        "options": {}
+      },
+      "id": "send-day7-email",
+      "name": "Send Day 7 Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1850, 300],
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-email@example.com",
+        "toEmail": "={{ $json.customerEmail }}",
+        "subject": "=Following Up - Quote #{{ $json.quoteID }}",
+        "emailType": "html",
+        "message": "=<p>Hi {{ $json.customerName }},</p>\n\n<p>I wanted to follow up on the quote we sent you two weeks ago.</p>\n\n<p><strong>Quote Details:</strong></p>\n<ul>\n  <li>Quote ID: {{ $json.quoteID }}</li>\n  <li>Date Issued: {{ $json.dateIssued }}</li>\n</ul>\n\n<p>Are you still interested? Is there anything holding you back that I can help address?</p>\n\n<p>Best regards,<br>Your Team</p>",
+        "options": {}
+      },
+      "id": "send-day14-email",
+      "name": "Send Day 14 Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1850, 400],
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-email@example.com",
+        "toEmail": "={{ $json.customerEmail }}",
+        "subject": "=Final Follow-up on Quote #{{ $json.quoteID }}",
+        "emailType": "html",
+        "message": "=<p>Hi {{ $json.customerName }},</p>\n\n<p>This is my final follow-up regarding the quote we sent you three weeks ago.</p>\n\n<p><strong>Quote Details:</strong></p>\n<ul>\n  <li>Quote ID: {{ $json.quoteID }}</li>\n  <li>Date Issued: {{ $json.dateIssued }}</li>\n</ul>\n\n<p>If you're no longer interested, that's absolutely fine - just let me know so I can close this out.</p>\n\n<p>Otherwise, I'm here whenever you're ready to move forward!</p>\n\n<p>Best regards,<br>Your Team</p>",
+        "options": {}
+      },
+      "id": "send-day21-email",
+      "name": "Send Day 21 Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1850, 500],
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Quote Follow-up Sequence\n\n**Automated follow-up emails for active quotes**\n\n### Timeline:\n- **Day 3:** Check-in email\n- **Day 7:** Acceptance prompt\n- **Day 14:** Follow-up reminder\n- **Day 21:** Final follow-up\n\n### How it Works:\n1. Gets all active quotes daily\n2. Filters quotes exactly 3, 7, 14, or 21 days old\n3. Sends appropriate follow-up email\n4. Skips accepted/declined/completed quotes\n\n### Setup:\n1. Link \"Fyrup Auth\" credential\n2. Configure SMTP credentials\n3. Update \"From\" email in all Send Email nodes\n4. Customize email templates\n5. Activate workflow\n\n### Note:\nRuns daily at 9 AM. Only sends to quotes on exact day markers (3, 7, 14, 21).",
+        "height": 460,
+        "width": 380
+      },
+      "id": "sticky-note",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [240, 480]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger (9 AM Daily)": {
+      "main": [
+        [
+          {
+            "node": "Get All Quotes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Quotes": {
+      "main": [
+        [
+          {
+            "node": "Filter Quotes for Follow-up",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Quotes for Follow-up": {
+      "main": [
+        [
+          {
+            "node": "Get All Customers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Customers": {
+      "main": [
+        [
+          {
+            "node": "Match Customer HREFs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match Customer HREFs": {
+      "main": [
+        [
+          {
+            "node": "Get Customer Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Customer Details": {
+      "main": [
+        [
+          {
+            "node": "Prepare Email Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Email Data": {
+      "main": [
+        [
+          {
+            "node": "Switch by Follow-up Day",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch by Follow-up Day": {
+      "main": [
+        [
+          {
+            "node": "Send Day 3 Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Day 7 Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Day 14 Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Day 21 Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1",
+  "id": "simpro-quote-followup",
+  "meta": {
+    "instanceId": "your-n8n-instance-id"
+  },
+  "tags": [],
+  "updatedAt": "2026-01-23T00:00:00.000Z"
+}

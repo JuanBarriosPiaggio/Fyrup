@@ -1,0 +1,99 @@
+{
+  "name": "Simpro Overdue Quotes - Simple Version",
+  "nodes": [
+    {
+      "parameters": {},
+      "name": "Manual Trigger (For Testing)",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://YOUR-COMPANY.simprosuite.com/api/v1.0/companies/YOUR_COMPANY_ID/quotes/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "pageSize",
+              "value": "10"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Get Quotes (Test - 10 quotes)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Simple test to see the quote data structure\nconst items = $input.all();\n\nconsole.log('Total items received:', items.length);\n\n// Just pass through the first 5 items to inspect\nif (items.length > 0) {\n  const firstItem = items[0];\n  console.log('Sample quote data:', JSON.stringify(firstItem.json, null, 2));\n  \n  // Return first 5 quotes for inspection\n  return items.slice(0, 5);\n}\n\nreturn items;"
+      },
+      "name": "Inspect Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        650,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "content": "## Simple Simpro Test Workflow\n\n### Purpose:\nThis is a simplified workflow for testing your Simpro API connection.\n\n### Steps to Use:\n\n1. **Set up OAuth2 credentials** for Simpro\n2. **Update the URL** in the HTTP Request node:\n   - Replace `YOUR-COMPANY` with your subdomain\n   - Replace `YOUR_COMPANY_ID` with your Company ID\n3. **Click Execute Workflow** to test\n4. **Check the \"Inspect Data\" node** output to see quote structure\n\n### What This Does:\n- Fetches only 10 quotes (for testing)\n- Displays the data structure\n- Helps you understand the API response\n\n### Next Steps:\n- Once this works, use the full workflow\n- The full workflow includes filtering and email sending",
+        "height": 371.11554868292427,
+        "width": 345.3854166666667,
+        "color": 5
+      },
+      "name": "Sticky Note - Test Instructions",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        240,
+        460
+      ]
+    }
+  ],
+  "connections": {
+    "Manual Trigger (For Testing)": {
+      "main": [
+        [
+          {
+            "node": "Get Quotes (Test - 10 quotes)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Quotes (Test - 10 quotes)": {
+      "main": [
+        [
+          {
+            "node": "Inspect Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 0,
+  "updatedAt": "2026-01-23T00:00:00.000Z",
+  "versionId": "1"
+}

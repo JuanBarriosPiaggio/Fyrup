@@ -1,0 +1,398 @@
+{
+  "name": "Simpro Overdue Quotes Reminder",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * *"
+            }
+          ]
+        }
+      },
+      "name": "Schedule Trigger - Daily 9AM",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1,
+      "position": [
+        250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "https://YOUR-COMPANY.simprosuite.com/api/v1.0/companies/YOUR_COMPANY_ID/quotes/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendQuery": true,
+        "queryParameters": {
+          "parameters": [
+            {
+              "name": "pageSize",
+              "value": "250"
+            },
+            {
+              "name": "columns",
+              "value": "ID,Description,DateIssued,DueDate,Status,Customer,CustomerContact,Total"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Get All Quotes from Simpro",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        450,
+        300
+      ],
+      "credentials": {
+        "oAuth2Api": {
+          "id": "YOUR_OAUTH2_CREDENTIAL_ID",
+          "name": "Simpro OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const items = $input.all();\nconst overdueQuotes = [];\nconst today = new Date();\nconst daysThreshold = 7; // 7 days overdue\n\n// Process each quote from the API response\nfor (const item of items) {\n  const quotes = Array.isArray(item.json) ? item.json : [item.json];\n  \n  for (const quote of quotes) {\n    // Skip if no due date\n    if (!quote.DueDate) {\n      continue;\n    }\n    \n    // Calculate days overdue\n    const dueDate = new Date(quote.DueDate);\n    const daysDiff = Math.floor((today - dueDate) / (1000 * 60 * 60 * 24));\n    \n    // Check if overdue by threshold (7+ days)\n    if (daysDiff >= daysThreshold) {\n      // Extract customer information\n      const customerName = quote.Customer?.CompanyName || \n                          `${quote.Customer?.GivenName || ''} ${quote.Customer?.FamilyName || ''}`.trim() ||\n                          'Customer';\n      \n      const contactName = `${quote.CustomerContact?.GivenName || ''} ${quote.CustomerContact?.FamilyName || ''}`.trim() ||\n                         customerName;\n      \n      overdueQuotes.push({\n        json: {\n          quoteId: quote.ID,\n          description: quote.Description || 'No description',\n          dateIssued: quote.DateIssued,\n          dueDate: quote.DueDate,\n          daysOverdue: daysDiff,\n          customerId: quote.Customer?.ID,\n          customerName: customerName,\n          contactId: quote.CustomerContact?.ID,\n          contactName: contactName,\n          totalAmount: quote.Total || 0,\n          statusId: quote.Status,\n          // Store full objects for later use\n          customerData: quote.Customer,\n          contactData: quote.CustomerContact\n        }\n      });\n    }\n  }\n}\n\n// Return filtered overdue quotes\nif (overdueQuotes.length === 0) {\n  console.log('No overdue quotes found');\n  return [];\n}\n\nconsole.log(`Found ${overdueQuotes.length} overdue quotes`);\nreturn overdueQuotes;"
+      },
+      "name": "Filter Overdue Quotes (7+ Days)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        650,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "1",
+              "leftValue": "={{ $json.contactId }}",
+              "rightValue": "",
+              "operator": {
+                "type": "number",
+                "operation": "exists",
+                "rightType": "any"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "Check if Contact ID Exists",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        850,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "url": "=https://YOUR-COMPANY.simprosuite.com/api/v1.0/companies/YOUR_COMPANY_ID/contacts/{{ $json.contactId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "options": {}
+      },
+      "name": "Get Contact Email",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1050,
+        200
+      ],
+      "credentials": {
+        "oAuth2Api": {
+          "id": "YOUR_OAUTH2_CREDENTIAL_ID",
+          "name": "Simpro OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "=https://YOUR-COMPANY.simprosuite.com/api/v1.0/companies/YOUR_COMPANY_ID/customers/{{ $json.customerId }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "options": {}
+      },
+      "name": "Get Customer Email (Fallback)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [
+        1050,
+        400
+      ],
+      "credentials": {
+        "oAuth2Api": {
+          "id": "YOUR_OAUTH2_CREDENTIAL_ID",
+          "name": "Simpro OAuth2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "1",
+              "name": "quoteId",
+              "value": "={{ $('Filter Overdue Quotes (7+ Days)').item.json.quoteId }}",
+              "type": "number"
+            },
+            {
+              "id": "2",
+              "name": "description",
+              "value": "={{ $('Filter Overdue Quotes (7+ Days)').item.json.description }}",
+              "type": "string"
+            },
+            {
+              "id": "3",
+              "name": "dateIssued",
+              "value": "={{ $('Filter Overdue Quotes (7+ Days)').item.json.dateIssued }}",
+              "type": "string"
+            },
+            {
+              "id": "4",
+              "name": "dueDate",
+              "value": "={{ $('Filter Overdue Quotes (7+ Days)').item.json.dueDate }}",
+              "type": "string"
+            },
+            {
+              "id": "5",
+              "name": "daysOverdue",
+              "value": "={{ $('Filter Overdue Quotes (7+ Days)').item.json.daysOverdue }}",
+              "type": "number"
+            },
+            {
+              "id": "6",
+              "name": "customerName",
+              "value": "={{ $('Filter Overdue Quotes (7+ Days)').item.json.customerName }}",
+              "type": "string"
+            },
+            {
+              "id": "7",
+              "name": "contactName",
+              "value": "={{ $('Filter Overdue Quotes (7+ Days)').item.json.contactName }}",
+              "type": "string"
+            },
+            {
+              "id": "8",
+              "name": "totalAmount",
+              "value": "={{ $('Filter Overdue Quotes (7+ Days)').item.json.totalAmount }}",
+              "type": "string"
+            },
+            {
+              "id": "9",
+              "name": "customerEmail",
+              "value": "={{ $json.Email || $json.EmailAddress || $json.email || '' }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "name": "Merge Quote and Contact Data",
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.2,
+      "position": [
+        1250,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict"
+          },
+          "conditions": [
+            {
+              "id": "1",
+              "leftValue": "={{ $json.customerEmail }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty"
+              }
+            },
+            {
+              "id": "2",
+              "leftValue": "={{ $json.customerEmail }}",
+              "rightValue": "@",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "name": "Verify Email Exists",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1450,
+        300
+      ]
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-email@your-company.com",
+        "toEmail": "={{ $json.customerEmail }}",
+        "subject": "=Payment Reminder: Quote #{{ $json.quoteId }} - {{ $json.daysOverdue }} Days Overdue",
+        "emailType": "html",
+        "message": "=<!DOCTYPE html>\n<html>\n<head>\n  <style>\n    body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; }\n    .container { max-width: 600px; margin: 0 auto; padding: 20px; }\n    .header { background-color: #f4f4f4; padding: 20px; border-radius: 5px; }\n    .content { padding: 20px 0; }\n    .quote-details { background-color: #f9f9f9; padding: 15px; border-left: 4px solid #ff6b6b; margin: 20px 0; }\n    .detail-row { margin: 10px 0; }\n    .label { font-weight: bold; color: #555; }\n    .value { color: #333; }\n    .footer { margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; font-size: 12px; color: #777; }\n    .overdue-badge { background-color: #ff6b6b; color: white; padding: 5px 10px; border-radius: 3px; display: inline-block; }\n  </style>\n</head>\n<body>\n  <div class=\"container\">\n    <div class=\"header\">\n      <h2>Payment Reminder</h2>\n      <p class=\"overdue-badge\">{{ $json.daysOverdue }} Days Overdue</p>\n    </div>\n    \n    <div class=\"content\">\n      <p>Dear {{ $json.contactName }},</p>\n      \n      <p>This is a friendly reminder that <strong>Quote #{{ $json.quoteId }}</strong> is now <strong>{{ $json.daysOverdue }} days overdue</strong>.</p>\n      \n      <div class=\"quote-details\">\n        <h3>Quote Details:</h3>\n        <div class=\"detail-row\">\n          <span class=\"label\">Quote Number:</span>\n          <span class=\"value\">#{{ $json.quoteId }}</span>\n        </div>\n        <div class=\"detail-row\">\n          <span class=\"label\">Description:</span>\n          <span class=\"value\">{{ $json.description }}</span>\n        </div>\n        <div class=\"detail-row\">\n          <span class=\"label\">Issue Date:</span>\n          <span class=\"value\">{{ $json.dateIssued }}</span>\n        </div>\n        <div class=\"detail-row\">\n          <span class=\"label\">Due Date:</span>\n          <span class=\"value\">{{ $json.dueDate }}</span>\n        </div>\n        <div class=\"detail-row\">\n          <span class=\"label\">Amount:</span>\n          <span class=\"value\"><strong>${{ $json.totalAmount }}</strong></span>\n        </div>\n        <div class=\"detail-row\">\n          <span class=\"label\">Days Overdue:</span>\n          <span class=\"value\"><strong style=\"color: #ff6b6b;\">{{ $json.daysOverdue }} days</strong></span>\n        </div>\n      </div>\n      \n      <p>Please arrange payment at your earliest convenience to avoid any service disruptions.</p>\n      \n      <p>If you have already made payment, please disregard this message or contact us to confirm receipt.</p>\n      \n      <p>If you have any questions or concerns regarding this quote, please don't hesitate to contact us.</p>\n      \n      <p>Best regards,<br>\n      <strong>Your Company Name</strong></p>\n    </div>\n    \n    <div class=\"footer\">\n      <p>This is an automated reminder. Please do not reply directly to this email.</p>\n      <p>Company Address | Phone: (XXX) XXX-XXXX | Email: info@yourcompany.com</p>\n    </div>\n  </div>\n</body>\n</html>",
+        "options": {}
+      },
+      "name": "Send Overdue Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2,
+      "position": [
+        1650,
+        200
+      ],
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_EMAIL_CREDENTIAL_ID",
+          "name": "SMTP Account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Simpro Overdue Quotes Workflow\n\n### Setup Instructions:\n\n1. **Configure OAuth2 Credentials:**\n   - Go to Credentials > Add Credential > OAuth2 API\n   - Set up your Simpro OAuth2 credentials\n   - Replace `YOUR_OAUTH2_CREDENTIAL_ID` with your credential ID\n\n2. **Update Company Information:**\n   - Replace `YOUR-COMPANY` with your Simpro subdomain\n   - Replace `YOUR_COMPANY_ID` with your actual Company ID\n\n3. **Configure Email Settings:**\n   - Set up SMTP credentials for sending emails\n   - Update the sender email address\n   - Customize the email template as needed\n\n4. **Adjust Overdue Threshold:**\n   - Default is 7 days\n   - Modify the `daysThreshold` variable in the filter node\n\n5. **Schedule:**\n   - Currently set to run daily at 9:00 AM\n   - Modify the cron expression in the Schedule Trigger node\n\n### Workflow Logic:\n\n1. Triggers daily at 9 AM\n2. Fetches all quotes from Simpro API\n3. Filters quotes overdue by 7+ days\n4. Attempts to get contact email (with customer fallback)\n5. Verifies email exists and is valid\n6. Sends formatted reminder email to each overdue quote\n\n### Notes:\n- The workflow handles both contact and customer email lookups\n- Includes error handling for missing emails\n- HTML email template is fully customizable\n- Supports pagination (default 250 quotes per request)",
+        "height": 464.79532952920877,
+        "width": 389.2722647050889,
+        "color": 4
+      },
+      "name": "Sticky Note - Instructions",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        240,
+        500
+      ]
+    }
+  ],
+  "connections": {
+    "Schedule Trigger - Daily 9AM": {
+      "main": [
+        [
+          {
+            "node": "Get All Quotes from Simpro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Quotes from Simpro": {
+      "main": [
+        [
+          {
+            "node": "Filter Overdue Quotes (7+ Days)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Overdue Quotes (7+ Days)": {
+      "main": [
+        [
+          {
+            "node": "Check if Contact ID Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check if Contact ID Exists": {
+      "main": [
+        [
+          {
+            "node": "Get Contact Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get Customer Email (Fallback)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Contact Email": {
+      "main": [
+        [
+          {
+            "node": "Merge Quote and Contact Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Customer Email (Fallback)": {
+      "main": [
+        [
+          {
+            "node": "Merge Quote and Contact Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Merge Quote and Contact Data": {
+      "main": [
+        [
+          {
+            "node": "Verify Email Exists",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Verify Email Exists": {
+      "main": [
+        [
+          {
+            "node": "Send Overdue Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "staticData": null,
+  "tags": [],
+  "triggerCount": 1,
+  "updatedAt": "2026-01-23T00:00:00.000Z",
+  "versionId": "1"
+}

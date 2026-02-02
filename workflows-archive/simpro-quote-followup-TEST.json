@@ -1,0 +1,225 @@
+{
+  "name": "Simpro Quote Follow-up - TEST VERSION",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "When clicking 'Test workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://fyrup.simprosuite.com/api/v1.0/companies/0/quotes/?pageSize=250&columns=ID,Description,DateIssued,Status,Customer,CustomerContact,Total",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "headerAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "usingFieldsBelow",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-quotes",
+      "name": "Get All Quotes",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [450, 300],
+      "credentials": {
+        "headerAuth": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "Fyrup Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// TEST VERSION: Shows ALL quotes that would trigger at 3, 7, 14, or 21 days\n// For testing, you can adjust the day ranges if needed\nconst today = new Date();\ntoday.setHours(0, 0, 0, 0);\n\nconst followUpGroups = {\n  day3: [],\n  day7: [],\n  day14: [],\n  day21: []\n};\n\nfor (const quote of $input.all()) {\n  const quoteData = quote.json;\n  \n  if (!quoteData.DateIssued) continue;\n  \n  // Extract status - handle if it's an object or string\n  let statusValue = '';\n  if (quoteData.Status) {\n    if (typeof quoteData.Status === 'object') {\n      statusValue = (quoteData.Status.Name || quoteData.Status.name || '').toString().toLowerCase();\n    } else {\n      statusValue = quoteData.Status.toString().toLowerCase();\n    }\n  }\n  \n  // Only process open/pending quotes\n  if (statusValue.includes('accept') || statusValue.includes('decline') || statusValue.includes('lost') || statusValue.includes('complete')) {\n    continue;\n  }\n  \n  const issueDate = new Date(quoteData.DateIssued);\n  issueDate.setHours(0, 0, 0, 0);\n  \n  const diffTime = today - issueDate;\n  const daysSinceIssued = Math.floor(diffTime / (1000 * 60 * 60 * 24));\n  \n  const customerID = quoteData.Customer?.ID || quoteData.Customer;\n  \n  if (!customerID) continue;\n  \n  const quoteInfo = {\n    quoteID: quoteData.ID,\n    customerID: customerID,\n    customerHref: null,\n    daysSinceIssued: daysSinceIssued,\n    dateIssued: quoteData.DateIssued,\n    status: statusValue || 'Unknown',\n    description: quoteData.Description || 'No description',\n    total: quoteData.Total\n  };\n  \n  // Match exact days\n  if (daysSinceIssued === 3) {\n    followUpGroups.day3.push({ json: { ...quoteInfo, followUpType: 'day3' } });\n  } else if (daysSinceIssued === 7) {\n    followUpGroups.day7.push({ json: { ...quoteInfo, followUpType: 'day7' } });\n  } else if (daysSinceIssued === 14) {\n    followUpGroups.day14.push({ json: { ...quoteInfo, followUpType: 'day14' } });\n  } else if (daysSinceIssued === 21) {\n    followUpGroups.day21.push({ json: { ...quoteInfo, followUpType: 'day21' } });\n  }\n}\n\n// Combine all groups\nconst allFollowUps = [\n  ...followUpGroups.day3,\n  ...followUpGroups.day7,\n  ...followUpGroups.day14,\n  ...followUpGroups.day21\n];\n\n// Add summary info\nconsole.log(`Day 3: ${followUpGroups.day3.length} quotes`);\nconsole.log(`Day 7: ${followUpGroups.day7.length} quotes`);\nconsole.log(`Day 14: ${followUpGroups.day14.length} quotes`);\nconsole.log(`Day 21: ${followUpGroups.day21.length} quotes`);\nconsole.log(`Total: ${allFollowUps.length} follow-ups`);\n\nreturn allFollowUps;"
+      },
+      "id": "filter-followups",
+      "name": "Filter Quotes for Follow-up",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://fyrup.simprosuite.com/api/v1.0/companies/0/customers/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "headerAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "usingFieldsBelow",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-customers",
+      "name": "Get All Customers",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [850, 300],
+      "credentials": {
+        "headerAuth": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "Fyrup Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Match quotes with customer _href URLs\nconst quotes = $('Filter Quotes for Follow-up').all();\nconst customers = $('Get All Customers').all();\n\n// Create customer ID to _href map\nconst customerMap = {};\nfor (const customer of customers) {\n  const custData = customer.json;\n  if (custData.ID && custData._href) {\n    customerMap[custData.ID] = custData._href;\n  }\n}\n\n// Add _href to each quote\nconst quotesWithHrefs = [];\nfor (const quote of quotes) {\n  const quoteData = quote.json;\n  const customerHref = customerMap[quoteData.customerID];\n  \n  if (customerHref) {\n    quotesWithHrefs.push({\n      json: {\n        ...quoteData,\n        customerHref: customerHref\n      }\n    });\n  }\n}\n\nreturn quotesWithHrefs;"
+      },
+      "id": "match-hrefs",
+      "name": "Match Customer HREFs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://fyrup.simprosuite.com{{ $json.customerHref }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "headerAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "usingFieldsBelow",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-customer-details",
+      "name": "Get Customer Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1250, 300],
+      "credentials": {
+        "headerAuth": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "Fyrup Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Merge customer email with quote data\nconst customerDetails = $input.item.json;\nconst quoteData = $('Match Customer HREFs').item.json;\n\n// Get email from customer details\nconst customerEmail = customerDetails.Email;\n\nif (!customerEmail || customerEmail.trim() === '') {\n  return [];\n}\n\nreturn [{\n  json: {\n    ...quoteData,\n    customerEmail: customerEmail,\n    customerName: customerDetails.CompanyName || `${customerDetails.GivenName} ${customerDetails.FamilyName}`.trim()\n  }\n}];"
+      },
+      "id": "prepare-email",
+      "name": "Prepare Email Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "content": "## TEST VERSION\n\n**Manual trigger for testing**\n\n### What This Tests:\n1. Gets all active quotes\n2. Filters by exact days (3, 7, 14, 21)\n3. Retrieves customer emails\n4. Shows which quotes would get emails\n5. NO EMAILS SENT (safe!)\n\n### Expected Output:\n- \"Filter Quotes for Follow-up\":\n  Shows quotes at 3, 7, 14, 21 days\n- \"Prepare Email Data\":\n  Shows customer emails retrieved\n\n### How to Test:\n1. Click \"Execute Workflow\"\n2. Check each node output\n3. Verify correct quotes selected\n4. Verify customer emails present\n\n### For Production:\nUse `simpro-quote-followup-sequence.json`\n- Daily schedule\n- Email sending enabled",
+        "height": 440,
+        "width": 380
+      },
+      "id": "sticky-note",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [240, 480]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking 'Test workflow'": {
+      "main": [
+        [
+          {
+            "node": "Get All Quotes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Quotes": {
+      "main": [
+        [
+          {
+            "node": "Filter Quotes for Follow-up",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Quotes for Follow-up": {
+      "main": [
+        [
+          {
+            "node": "Get All Customers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Customers": {
+      "main": [
+        [
+          {
+            "node": "Match Customer HREFs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match Customer HREFs": {
+      "main": [
+        [
+          {
+            "node": "Get Customer Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Customer Details": {
+      "main": [
+        [
+          {
+            "node": "Prepare Email Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1",
+  "id": "simpro-quote-followup-test",
+  "meta": {
+    "instanceId": "your-n8n-instance-id"
+  },
+  "tags": [],
+  "updatedAt": "2026-01-23T00:00:00.000Z"
+}

@@ -1,0 +1,225 @@
+{
+  "name": "Simpro Overdue Quotes - TEST (Lower Threshold)",
+  "nodes": [
+    {
+      "parameters": {},
+      "id": "manual-trigger",
+      "name": "When clicking 'Test workflow'",
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://fyrup.simprosuite.com/api/v1.0/companies/0/quotes/?pageSize=250&columns=ID,Description,DateIssued,ValidityDays,Customer,CustomerContact,Total",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "headerAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "usingFieldsBelow",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-quotes",
+      "name": "Get All Quotes",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [450, 300],
+      "credentials": {
+        "headerAuth": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "Fyrup Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter quotes overdue by 7+ days using Simpro's expiry calculation\n// Expiry = DateIssued + ValidityDays\nconst today = new Date();\nconst overdueQuotes = [];\n\nfor (const quote of $input.all()) {\n  const quoteData = quote.json;\n  \n  // Check if quote has DateIssued and ValidityDays\n  if (!quoteData.DateIssued || !quoteData.ValidityDays) continue;\n  \n  // Calculate expiry date (DateIssued + ValidityDays)\n  const issueDate = new Date(quoteData.DateIssued);\n  const expiryDate = new Date(issueDate);\n  expiryDate.setDate(expiryDate.getDate() + quoteData.ValidityDays);\n  \n  // Calculate days overdue\n  const diffTime = today - expiryDate;\n  const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));\n  \n  // Extract customer ID (API returns object with ID field)\n  const customerID = quoteData.Customer?.ID || quoteData.Customer;\n  \n  // If expired 7 or more days ago, add to list\n  if (diffDays >= 7 && customerID) {\n    overdueQuotes.push({\n      json: {\n        quoteID: quoteData.ID,\n        customerID: customerID,\n        customerHref: null,  // Will be populated next\n        daysOverdue: diffDays,\n        dateIssued: quoteData.DateIssued,\n        validityDays: quoteData.ValidityDays,\n        expiryDate: expiryDate.toISOString().split('T')[0],\n        description: quoteData.Description || 'No description'\n      }\n    });\n  }\n}\n\nreturn overdueQuotes;"
+      },
+      "id": "filter-overdue",
+      "name": "Filter Overdue Quotes (7+ days)",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://fyrup.simprosuite.com/api/v1.0/companies/0/customers/",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "headerAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "usingFieldsBelow",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-customers",
+      "name": "Get All Customers (with hrefs)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [850, 300],
+      "credentials": {
+        "headerAuth": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "Fyrup Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Match quotes with customer _href URLs\nconst quotes = $('Filter Overdue Quotes (7+ days)').all();\nconst customers = $('Get All Customers (with hrefs)').all();\n\n// Create customer ID to _href map\nconst customerMap = {};\nfor (const customer of customers) {\n  const custData = customer.json;\n  if (custData.ID && custData._href) {\n    customerMap[custData.ID] = custData._href;\n  }\n}\n\n// Add _href to each quote\nconst quotesWithHrefs = [];\nfor (const quote of quotes) {\n  const quoteData = quote.json;\n  const customerHref = customerMap[quoteData.customerID];\n  \n  if (customerHref) {\n    quotesWithHrefs.push({\n      json: {\n        ...quoteData,\n        customerHref: customerHref\n      }\n    });\n  }\n}\n\nreturn quotesWithHrefs;"
+      },
+      "id": "match-hrefs",
+      "name": "Match Quotes with Customer HREFs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://fyrup.simprosuite.com{{ $json.customerHref }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "headerAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "usingFieldsBelow",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-customer-details",
+      "name": "Get Customer Details (with Email)",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1250, 300],
+      "credentials": {
+        "headerAuth": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "Fyrup Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Merge customer email with quote data\nconst customerDetails = $input.item.json;\nconst quoteData = $('Match Quotes with Customer HREFs').item.json;\n\n// Get email from customer details\nconst customerEmail = customerDetails.Email;\n\nif (!customerEmail || customerEmail.trim() === '') {\n  // Skip if no email\n  return [];\n}\n\nreturn [{\n  json: {\n    ...quoteData,\n    customerEmail: customerEmail,\n    customerName: customerDetails.CompanyName || `${customerDetails.GivenName} ${customerDetails.FamilyName}`.trim()\n  }\n}];"
+      },
+      "id": "prepare-email",
+      "name": "Prepare Email Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "content": "## TEST VERSION - Manual Trigger\n\n**CORRECT expiry calculation: DateIssued + ValidityDays**\n\nThis version:\n- Manual trigger (click to test)\n- Uses 7-day threshold (correct!)\n- Gets ALL quotes (pageSize=1000)\n- Uses DateIssued + ValidityDays for expiry\n- No email sending (safe for testing)\n\n### Expected Results:\n- 212 quotes expired 7+ days ago\n- Customer emails retrieved via _href\n\n### How to Test:\n1. Click \"Execute Workflow\"\n2. Check \"Filter Overdue Quotes\" output\n3. Should show ~212 overdue quotes\n4. Verify customer emails retrieved\n\n### For Production:\nUse `simpro-overdue-quotes-WORKING.json`\n- Daily schedule at 9 AM\n- Email sending enabled",
+        "height": 460,
+        "width": 380
+      },
+      "id": "sticky-note",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [240, 480]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When clicking 'Test workflow'": {
+      "main": [
+        [
+          {
+            "node": "Get All Quotes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Quotes": {
+      "main": [
+        [
+          {
+            "node": "Filter Overdue Quotes (7+ days)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Overdue Quotes (7+ days)": {
+      "main": [
+        [
+          {
+            "node": "Get All Customers (with hrefs)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Customers (with hrefs)": {
+      "main": [
+        [
+          {
+            "node": "Match Quotes with Customer HREFs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match Quotes with Customer HREFs": {
+      "main": [
+        [
+          {
+            "node": "Get Customer Details (with Email)",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Customer Details (with Email)": {
+      "main": [
+        [
+          {
+            "node": "Prepare Email Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1",
+  "id": "simpro-overdue-quotes-test",
+  "meta": {
+    "instanceId": "your-n8n-instance-id"
+  },
+  "tags": [],
+  "updatedAt": "2026-01-23T00:00:00.000Z"
+}

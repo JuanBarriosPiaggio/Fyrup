@@ -1,0 +1,392 @@
+{
+  "name": "Simpro Unpaid Invoice Follow-up Sequence",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * *"
+            }
+          ]
+        }
+      },
+      "id": "schedule-trigger",
+      "name": "Schedule Trigger (9 AM Daily)",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.1,
+      "position": [250, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://fyrup.simprosuite.com/api/v1.0/companies/0/invoices/?pageSize=250&columns=ID,DateIssued,IsPaid,Total,Customer",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "headerAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "usingFieldsBelow",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-invoices",
+      "name": "Get All Invoices",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [450, 300],
+      "credentials": {
+        "headerAuth": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "Fyrup Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Filter unpaid invoices for follow-up based on days since issued\n// Day 3, 7, 14, or 21 after DateIssued\nconst today = new Date();\ntoday.setHours(0, 0, 0, 0);\n\nconst followUpGroups = {\n  day3: [],\n  day7: [],\n  day14: [],\n  day21: []\n};\n\nfor (const invoice of $input.all()) {\n  const invoiceData = invoice.json;\n  \n  // Skip if no DateIssued\n  if (!invoiceData.DateIssued) continue;\n  \n  // Only process UNPAID invoices\n  if (invoiceData.IsPaid === true) continue;\n  \n  // Calculate days since issued\n  const issueDate = new Date(invoiceData.DateIssued);\n  issueDate.setHours(0, 0, 0, 0);\n  \n  const diffTime = today - issueDate;\n  const daysSinceIssued = Math.floor(diffTime / (1000 * 60 * 60 * 24));\n  \n  // Extract customer ID\n  const customerID = invoiceData.Customer?.ID || null;\n  if (!customerID) continue;\n  \n  // Get customer name\n  const customerName = invoiceData.Customer?.CompanyName || \n                      `${invoiceData.Customer?.GivenName || ''} ${invoiceData.Customer?.FamilyName || ''}`.trim();\n  \n  // Get balance due\n  const balanceDue = invoiceData.Total?.BalanceDue || invoiceData.Total?.IncTax || 0;\n  \n  // Categorize by follow-up day\n  const invoiceInfo = {\n    invoiceID: invoiceData.ID,\n    customerID: customerID,\n    customerHref: null,  // Will populate from customer list\n    customerName: customerName,\n    daysSinceIssued: daysSinceIssued,\n    dateIssued: invoiceData.DateIssued,\n    balanceDue: balanceDue,\n    totalAmount: invoiceData.Total?.IncTax || 0\n  };\n  \n  if (daysSinceIssued === 3) {\n    followUpGroups.day3.push({ json: { ...invoiceInfo, followUpType: 'day3' } });\n  } else if (daysSinceIssued === 7) {\n    followUpGroups.day7.push({ json: { ...invoiceInfo, followUpType: 'day7' } });\n  } else if (daysSinceIssued === 14) {\n    followUpGroups.day14.push({ json: { ...invoiceInfo, followUpType: 'day14' } });\n  } else if (daysSinceIssued === 21) {\n    followUpGroups.day21.push({ json: { ...invoiceInfo, followUpType: 'day21' } });\n  }\n}\n\n// Combine all groups\nconst allFollowUps = [\n  ...followUpGroups.day3,\n  ...followUpGroups.day7,\n  ...followUpGroups.day14,\n  ...followUpGroups.day21\n];\n\nreturn allFollowUps;"
+      },
+      "id": "filter-followups",
+      "name": "Filter Unpaid Invoices for Follow-up",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [650, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "https://fyrup.simprosuite.com/api/v1.0/companies/0/customers/?pageSize=250",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "headerAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "usingFieldsBelow",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-customers",
+      "name": "Get All Customers",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [850, 300],
+      "credentials": {
+        "headerAuth": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "Fyrup Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Match invoices with customer _href URLs\nconst invoices = $('Filter Unpaid Invoices for Follow-up').all();\nconst customers = $('Get All Customers').all();\n\n// Create customer ID to _href map\nconst customerMap = {};\nfor (const customer of customers) {\n  const custData = customer.json;\n  if (custData.ID && custData._href) {\n    customerMap[custData.ID] = custData._href;\n  }\n}\n\n// Add _href to each invoice\nconst invoicesWithHrefs = [];\nfor (const invoice of invoices) {\n  const invoiceData = invoice.json;\n  const customerHref = customerMap[invoiceData.customerID];\n  \n  if (customerHref) {\n    invoicesWithHrefs.push({\n      json: {\n        ...invoiceData,\n        customerHref: customerHref\n      }\n    });\n  }\n}\n\nreturn invoicesWithHrefs;"
+      },
+      "id": "match-hrefs",
+      "name": "Match Customer HREFs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1050, 300]
+    },
+    {
+      "parameters": {
+        "method": "GET",
+        "url": "=https://fyrup.simprosuite.com{{ $json.customerHref }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "headerAuth",
+        "sendHeaders": true,
+        "specifyHeaders": "usingFieldsBelow",
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Accept",
+              "value": "application/json"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "id": "get-customer-details",
+      "name": "Get Customer Details",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.1,
+      "position": [1250, 300],
+      "credentials": {
+        "headerAuth": {
+          "id": "YOUR_CREDENTIAL_ID",
+          "name": "Fyrup Auth"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "// Merge customer email with invoice data\nconst customerDetails = $input.item.json;\nconst invoiceData = $('Match Customer HREFs').item.json;\n\n// Get email from customer details\nconst customerEmail = customerDetails.Email;\n\nif (!customerEmail || customerEmail.trim() === '') {\n  return [];\n}\n\nreturn [{\n  json: {\n    ...invoiceData,\n    customerEmail: customerEmail\n  }\n}];"
+      },
+      "id": "prepare-email",
+      "name": "Prepare Email Data",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1450, 300]
+    },
+    {
+      "parameters": {
+        "dataType": "string",
+        "value1": "={{ $json.followUpType }}",
+        "rules": {
+          "rules": [
+            {
+              "value2": "day3",
+              "output": 0
+            },
+            {
+              "value2": "day7",
+              "output": 1
+            },
+            {
+              "value2": "day14",
+              "output": 2
+            },
+            {
+              "value2": "day21",
+              "output": 3
+            }
+          ]
+        }
+      },
+      "id": "switch-day",
+      "name": "Switch by Follow-up Day",
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 2,
+      "position": [1650, 300]
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-email@example.com",
+        "toEmail": "={{ $json.customerEmail }}",
+        "subject": "=Payment Reminder - Invoice #{{ $json.invoiceID }}",
+        "emailType": "html",
+        "message": "=<p>Hi {{ $json.customerName }},</p>\n\n<p>This is a friendly reminder that we have not yet received payment for the invoice below.</p>\n\n<p><strong>Invoice Details:</strong></p>\n<ul>\n  <li>Invoice #: {{ $json.invoiceID }}</li>\n  <li>Date Issued: {{ $json.dateIssued }}</li>\n  <li>Amount Due: £{{ $json.balanceDue }}</li>\n</ul>\n\n<p>If you have already made this payment, please disregard this message. Otherwise, please arrange payment at your earliest convenience.</p>\n\n<p>If you have any questions, please don't hesitate to contact us.</p>\n\n<p>Best regards,<br>Your Team</p>",
+        "options": {}
+      },
+      "id": "send-day3-email",
+      "name": "Send Day 3 Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1850, 200],
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-email@example.com",
+        "toEmail": "={{ $json.customerEmail }}",
+        "subject": "=Payment Overdue - Invoice #{{ $json.invoiceID }}",
+        "emailType": "html",
+        "message": "=<p>Hi {{ $json.customerName }},</p>\n\n<p>Our records show that payment for the invoice below is now overdue.</p>\n\n<p><strong>Invoice Details:</strong></p>\n<ul>\n  <li>Invoice #: {{ $json.invoiceID }}</li>\n  <li>Date Issued: {{ $json.dateIssued }}</li>\n  <li>Amount Due: £{{ $json.balanceDue }}</li>\n  <li>Days Overdue: {{ $json.daysSinceIssued }}</li>\n</ul>\n\n<p>Please arrange payment as soon as possible to avoid any late payment fees or service interruption.</p>\n\n<p>If you have any questions or concerns about this invoice, please contact us immediately.</p>\n\n<p>Best regards,<br>Your Team</p>",
+        "options": {}
+      },
+      "id": "send-day7-email",
+      "name": "Send Day 7 Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1850, 300],
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-email@example.com",
+        "toEmail": "={{ $json.customerEmail }}",
+        "subject": "=URGENT: Payment Required - Invoice #{{ $json.invoiceID }}",
+        "emailType": "html",
+        "message": "=<p>Hi {{ $json.customerName }},</p>\n\n<p><strong>This is an urgent reminder that your invoice payment is significantly overdue.</strong></p>\n\n<p><strong>Invoice Details:</strong></p>\n<ul>\n  <li>Invoice #: {{ $json.invoiceID }}</li>\n  <li>Date Issued: {{ $json.dateIssued }}</li>\n  <li>Amount Due: £{{ $json.balanceDue }}</li>\n  <li>Days Overdue: {{ $json.daysSinceIssued }}</li>\n</ul>\n\n<p>Immediate payment is required to avoid:</p>\n<ul>\n  <li>Late payment fees</li>\n  <li>Service suspension</li>\n  <li>Referral to debt collection</li>\n</ul>\n\n<p>Please contact us urgently if there are any issues preventing payment.</p>\n\n<p>Best regards,<br>Your Team</p>",
+        "options": {}
+      },
+      "id": "send-day14-email",
+      "name": "Send Day 14 Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1850, 400],
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "your-email@example.com",
+        "toEmail": "={{ $json.customerEmail }}",
+        "subject": "=FINAL NOTICE: Invoice #{{ $json.invoiceID }} - Action Required",
+        "emailType": "html",
+        "message": "=<p>Hi {{ $json.customerName }},</p>\n\n<p><strong>FINAL NOTICE:</strong> This is our final reminder regarding the overdue invoice below.</p>\n\n<p><strong>Invoice Details:</strong></p>\n<ul>\n  <li>Invoice #: {{ $json.invoiceID }}</li>\n  <li>Date Issued: {{ $json.dateIssued }}</li>\n  <li>Amount Due: £{{ $json.balanceDue }}</li>\n  <li>Days Overdue: {{ $json.daysSinceIssued }}</li>\n</ul>\n\n<p><strong>If payment is not received within 7 days, we will be forced to:</strong></p>\n<ul>\n  <li>Suspend all services</li>\n  <li>Apply late payment fees</li>\n  <li>Refer this matter to a debt collection agency</li>\n  <li>Report to credit agencies</li>\n</ul>\n\n<p>Please contact us immediately to arrange payment or discuss payment terms.</p>\n\n<p>Best regards,<br>Your Team</p>",
+        "options": {}
+      },
+      "id": "send-day21-email",
+      "name": "Send Day 21 Email",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [1850, 500],
+      "credentials": {
+        "smtp": {
+          "id": "YOUR_SMTP_CREDENTIAL_ID",
+          "name": "SMTP account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Unpaid Invoice Follow-up Sequence\n\n**Automated payment reminder emails for unpaid invoices**\n\n### Timeline:\n- **Day 3:** Friendly reminder\n- **Day 7:** Payment overdue notice\n- **Day 14:** Urgent payment required\n- **Day 21:** Final notice\n\n### How it Works:\n1. Gets all invoices daily\n2. Filters UNPAID invoices (IsPaid = false)\n3. Calculates days since DateIssued\n4. Sends appropriate reminder at 3, 7, 14, 21 days\n5. Gets customer emails via _href\n\n### Setup:\n1. Link \"Fyrup Auth\" credential\n2. Configure SMTP credentials\n3. Update \"From\" email in all Send Email nodes\n4. Customize email templates & currency symbol\n5. Activate workflow\n\n### Note:\nRuns daily at 9 AM. Only sends to unpaid invoices on exact day markers.",
+        "height": 460,
+        "width": 380
+      },
+      "id": "sticky-note",
+      "name": "Sticky Note",
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [240, 480]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule Trigger (9 AM Daily)": {
+      "main": [
+        [
+          {
+            "node": "Get All Invoices",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Invoices": {
+      "main": [
+        [
+          {
+            "node": "Filter Unpaid Invoices for Follow-up",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Filter Unpaid Invoices for Follow-up": {
+      "main": [
+        [
+          {
+            "node": "Get All Customers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get All Customers": {
+      "main": [
+        [
+          {
+            "node": "Match Customer HREFs",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Match Customer HREFs": {
+      "main": [
+        [
+          {
+            "node": "Get Customer Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get Customer Details": {
+      "main": [
+        [
+          {
+            "node": "Prepare Email Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare Email Data": {
+      "main": [
+        [
+          {
+            "node": "Switch by Follow-up Day",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch by Follow-up Day": {
+      "main": [
+        [
+          {
+            "node": "Send Day 3 Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Day 7 Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Day 14 Email",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send Day 21 Email",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1",
+  "id": "simpro-invoice-followup",
+  "meta": {
+    "instanceId": "your-n8n-instance-id"
+  },
+  "tags": [],
+  "updatedAt": "2026-01-23T00:00:00.000Z"
+}

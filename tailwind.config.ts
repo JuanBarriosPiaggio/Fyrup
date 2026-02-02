@@ -9,6 +9,7 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
+        // Original Orange Theme
         primary: {
           50: '#fff7ed',
           100: '#ffedd5',
@@ -20,6 +21,14 @@ const config: Config = {
           700: '#c2410c',
           800: '#9a3412',
           900: '#7c2d12',
+        },
+        // New Copper Theme
+        copper: {
+          primary: '#B37D56',
+          light: '#D4A07E',
+          bronze: '#7D513A',
+          dark: '#4D3124',
+          bg: '#FAF9F6',
         },
         dark: {
           50: '#f8fafc',

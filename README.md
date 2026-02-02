@@ -1,188 +1,65 @@
-# Fyrup Website
+# Fyrup - Simpro Automation
 
-A modern, redesigned website for Fyrup - London's leading provider of passive fire protection and fire risk assessments.
+Website and N8N workflow automation for quote and invoice follow-ups.
 
-## 🔥 About
+## Project Structure
 
-This website showcases Fyrup's fire protection services with a premium, modern design featuring:
+```
+📁 Fyrup/
+├── 📁 app/                    # Next.js website pages
+├── 📁 components/             # React components
+├── 📁 public/                 # Static assets
+├── 📁 docs/                   # 📚 All documentation
+├── 📁 scripts/                # 🧪 Test scripts (PowerShell)
+├── 📁 workflows-archive/      # 📦 Old/test N8N workflows
+│
+├── simpro-quote-followup-sequence.json      # ✅ PRODUCTION: Quote follow-ups
+├── simpro-invoice-followup-sequence.json    # ✅ PRODUCTION: Invoice follow-ups
+└── swagger.json               # Simpro API documentation
+```
 
-- Fire Risk Assessments
-- Fire Stopping
-- Fire Doors
-- Fire Dampers
+## Quick Start
 
-Built with Next.js 14, TypeScript, and Tailwind CSS for optimal performance and user experience.
+### For N8N Workflows
+1. Go to `docs/START-HERE-FOLLOWUP.md` for quote follow-ups
+2. Go to `docs/START-HERE-INVOICES.md` for invoice follow-ups
 
-## 🚀 Getting Started
+### For Testing
+Run any script from the `scripts/` folder to test API connectivity:
+```powershell
+.\scripts\test-quote-followup.ps1
+.\scripts\test-invoice-followup.ps1
+```
 
-### Prerequisites
+## Production Workflows
 
-- Node.js 18+ installed
-- npm or yarn package manager
+### Quote Follow-up Sequence
+**File:** `simpro-quote-followup-sequence.json`
+- Sends follow-up emails for open quotes
+- Timeline: Day 3, 7, 14, 21 after DateIssued
+- Filters out Accepted/Declined/Lost/Completed quotes
 
-### Installation
+### Invoice Follow-up Sequence
+**File:** `simpro-invoice-followup-sequence.json`
+- Sends payment reminders for unpaid invoices
+- Timeline: Day 3, 7, 14, 21 after DateIssued
+- Only processes unpaid invoices (IsPaid: false)
 
-1. Install dependencies:
+## Documentation
+
+All setup guides, troubleshooting, and technical docs are in the `docs/` folder:
+- `docs/COMPLETE-WORKFLOW-SUMMARY.md` - Overview of both workflows
+- `docs/QUOTE-FOLLOWUP-GUIDE.md` - Quote workflow setup
+- `docs/INVOICE-FOLLOWUP-GUIDE.md` - Invoice workflow setup
+- `docs/CONFIGURATION-CHECKLIST.md` - Pre-deployment checklist
+
+## Website Development
+
+This is a Next.js project:
 
 ```bash
 npm install
-```
-
-2. Run the development server:
-
-```bash
 npm run dev
 ```
 
-3. Open [http://localhost:3000](http://localhost:3000) in your browser
-
-## 📁 Project Structure
-
-```
-├── app/                    # Next.js app directory
-│   ├── about/             # About pages (Values, Guarantee)
-│   ├── services/          # Service pages
-│   ├── contact/           # Contact page
-│   ├── faqs/              # FAQs page
-│   ├── layout.tsx         # Root layout
-│   ├── page.tsx           # Home page
-│   └── globals.css        # Global styles
-├── components/            # Reusable components
-│   ├── Header.tsx         # Navigation header
-│   └── Footer.tsx         # Site footer
-├── public/                # Static assets
-└── package.json           # Dependencies
-```
-
-## 🎨 Design Features
-
-- **Dark Hero Sections** with gradient overlays and mesh backgrounds
-- **Rounded Containers** (rounded-2xl, rounded-3xl) for modern aesthetic
-- **Bold Typography** with large headings (text-5xl to text-7xl)
-- **Red/Orange Gradient Accents** (#DC2626 to #EA580C) for fire safety theme
-- **Premium Spacing** with generous padding and margins
-- **Smooth Animations** with hover effects and transitions
-- **Responsive Design** optimized for all devices
-
-## 🖼️ Adding Your Logo
-
-### Replace the Placeholder Logo
-
-1. Download your Fyrup logo from the original website
-2. Convert to SVG format (recommended) or use PNG
-3. Replace the placeholder files:
-   - `public/logo.svg` - Main logo
-   - `app/favicon.ico` - Browser favicon
-   - Optionally add: `public/logo.png` for broader compatibility
-
-### Update the Header Component
-
-If using a custom logo file, update `components/Header.tsx`:
-
-```tsx
-// Replace the text logo with an image
-<Link href="/" className="flex items-center">
-  <Image src="/logo.svg" alt="Fyrup" width={120} height={40} />
-</Link>
-```
-
-## 📝 Content
-
-All content has been preserved from the original Fyrup website including:
-
-- Company information and contact details
-- Service descriptions
-- HOPP values (Honest, Open, Professional, Passionate)
-- All original copy and messaging
-
-## 🛠️ Build for Production
-
-```bash
-npm run build
-npm start
-```
-
-## 📦 Deployment
-
-This Next.js application can be deployed to:
-
-- **Vercel** (recommended) - Zero configuration
-- **Netlify**
-- **Railway**
-- **AWS**
-- Any Node.js hosting platform
-
-### Environment Variables
-
-No environment variables are currently required. For production, you may want to add:
-
-- Email service API keys (for contact form)
-- Analytics tracking IDs
-- CMS credentials (if adding a CMS)
-
-## 🎯 Key Pages
-
-- **Home** (`/`) - Hero section, services overview, quote form
-- **About - Values** (`/about/values`) - HOPP core values
-- **About - Guarantee** (`/about/guarantee`) - Service commitments
-- **Fire Risk Assessments** (`/services/fire-risk-assessments`)
-- **Fire Stopping** (`/services/fire-stopping`)
-- **Fire Doors** (`/services/fire-doors`)
-- **Fire Dampers** (`/services/fire-dampers`)
-- **Contact** (`/contact`) - Contact form and information
-- **FAQs** (`/faqs`) - Frequently asked questions
-
-## 🎨 Color Palette
-
-- **Primary Red**: #DC2626 (red-600)
-- **Secondary Orange**: #EA580C (orange-600)
-- **Dark Slate**: #0F172A (slate-900)
-- **Light Gray**: #F9FAFB (gray-50)
-- **Text Dark**: #111827 (gray-900)
-
-## 📱 Features
-
-- ✅ Fully responsive design
-- ✅ SEO optimized with metadata
-- ✅ Accessible navigation
-- ✅ Interactive forms
-- ✅ Smooth animations
-- ✅ Fast page loads
-- ✅ Modern UI/UX
-
-## 📞 Contact Information
-
-- **Phone**: 020 3576 2292
-- **Email**: info@fyrup.co.uk
-- **Address**: 45-55 Commercial Street, London, E1 6BD
-
-## 📄 License
-
-© 2026 Fyrup. All rights reserved.
-
-## 🔧 Technical Stack
-
-- **Framework**: Next.js 15
-- **Language**: TypeScript
-- **Styling**: Tailwind CSS
-- **Icons**: Lucide React
-- **Fonts**: Inter (Google Fonts)
-
-## 💡 Future Enhancements
-
-Potential additions for future versions:
-
-- Blog/News section
-- Case studies/portfolio
-- Client testimonials
-- Live chat support
-- Online booking system
-- Email integration for contact forms
-- CMS integration (Sanity, Contentful, etc.)
-- Image optimization with actual photos
-- Google Maps integration
-- Performance monitoring
-
----
-
-Built with ❤️ for Fyrup - Protecting London for over 15 years
+Open [http://localhost:3000](http://localhost:3000) to view the website.
