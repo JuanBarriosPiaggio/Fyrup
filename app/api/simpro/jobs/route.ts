@@ -10,7 +10,7 @@ export async function GET(request: NextRequest) {
     const dateFilter = searchParams.get('filter') || '30';
     
     const response = await fetch(
-      `${SIMPRO_API_URL}/companies/${COMPANY_ID}/jobs/?pageSize=250&columns=ID,Status,Customer,Total,DateCreated`,
+      `${SIMPRO_API_URL}/companies/${COMPANY_ID}/jobs/?pageSize=250&columns=ID,Status,Customer,Total,DateIssued`,
       {
         headers: {
           'Authorization': `Bearer ${SIMPRO_TOKEN}`,
@@ -30,8 +30,8 @@ export async function GET(request: NextRequest) {
     // Filter by date range
     const startDate = getStartDate(dateFilter);
     const filteredData = data.filter((job: any) => {
-      const createdDate = new Date(job.DateCreated);
-      return createdDate >= startDate;
+      const issuedDate = new Date(job.DateIssued);
+      return issuedDate >= startDate;
     });
 
     return NextResponse.json(filteredData);

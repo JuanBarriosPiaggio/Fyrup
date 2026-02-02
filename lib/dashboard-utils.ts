@@ -137,12 +137,12 @@ export function formatCurrency(amount: number): string {
 // Get recent jobs from jobs array
 export function getRecentJobs(jobs: any[], limit: number = 5) {
   return jobs
-    .sort((a, b) => new Date(b.DateCreated).getTime() - new Date(a.DateCreated).getTime())
+    .sort((a, b) => new Date(b.DateIssued).getTime() - new Date(a.DateIssued).getTime())
     .slice(0, limit)
     .map(job => {
       const today = new Date();
-      const createdDate = new Date(job.DateCreated);
-      const daysOpen = daysBetween(createdDate, today);
+      const issuedDate = new Date(job.DateIssued);
+      const daysOpen = daysBetween(issuedDate, today);
       const status = getStatusName(job.Status)?.toLowerCase() || 'unknown';
       
       return {
