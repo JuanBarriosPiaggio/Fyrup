@@ -1,6 +1,6 @@
 # Fyrup - Simpro Automation
 
-Website and N8N workflow automation for quote and invoice follow-ups.
+Next.js website with business intelligence dashboard and N8N workflow automation for quote and invoice follow-ups.
 
 ## Project Structure
 
@@ -20,6 +20,13 @@ Website and N8N workflow automation for quote and invoice follow-ups.
 
 ## Quick Start
 
+### For Dashboard
+```bash
+npm install
+npm run dev
+# Navigate to http://localhost:3000/dashboard
+```
+
 ### For N8N Workflows
 1. Go to `docs/START-HERE-FOLLOWUP.md` for quote follow-ups
 2. Go to `docs/START-HERE-INVOICES.md` for invoice follow-ups
@@ -30,6 +37,33 @@ Run any script from the `scripts/` folder to test API connectivity:
 .\scripts\test-quote-followup.ps1
 .\scripts\test-invoice-followup.ps1
 ```
+
+## Simpro Dashboard
+
+**Route:** `/dashboard`  
+**Status:** ✅ LIVE with real-time Simpro data
+
+A modern business intelligence dashboard displaying real-time metrics from Simpro:
+- Financial summary cards (invoices, quotes, payments)
+- Actionable alerts (overdue invoices, pending quotes)
+- Visual charts (status distribution, conversion funnel)
+- Recent jobs table
+- Top estimators performance
+- Key performance indicators
+
+**Features:**
+- ✅ **Live Simpro API integration** - Real data from fyrup.simprosuite.com
+- Clean SaaS-style UI inspired by modern design principles
+- Date range filtering (7/30/90 days)
+- Branch/team filtering
+- Export to PDF/CSV (ready to implement)
+- Theme toggle (Copper/Orange)
+- Fully responsive design
+- Loading states and error handling
+
+**Documentation:** 
+- Quick overview: `docs/DASHBOARD-SUMMARY.md`
+- API integration: `docs/DASHBOARD-LIVE-INTEGRATION.md`
 
 ## Production Workflows
 

@@ -8,6 +8,14 @@ Quick navigation for all documentation files.
 - **[START-HERE-INVOICES.md](START-HERE-INVOICES.md)** - Quick start for invoice follow-up workflow
 - **[START-HERE.md](START-HERE.md)** - Original quick start guide
 
+## 📊 Dashboard Documentation
+
+- **[DASHBOARD-SUMMARY.md](DASHBOARD-SUMMARY.md)** - Complete dashboard overview and status
+- **[DASHBOARD-LIVE-INTEGRATION.md](DASHBOARD-LIVE-INTEGRATION.md)** - ✅ LIVE API integration details
+- **[DASHBOARD-GUIDE.md](DASHBOARD-GUIDE.md)** - Implementation guide and features
+- **[DASHBOARD-API-SPEC.md](DASHBOARD-API-SPEC.md)** - API integration specifications
+- **[DASHBOARD-QUICK-REF.md](DASHBOARD-QUICK-REF.md)** - Quick reference card
+
 ## 📘 Setup & Configuration
 
 - **[QUOTE-FOLLOWUP-GUIDE.md](QUOTE-FOLLOWUP-GUIDE.md)** - Complete setup guide for quote follow-ups
