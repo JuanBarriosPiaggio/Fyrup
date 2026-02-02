@@ -209,7 +209,7 @@ export default function Dashboard() {
     <div className="min-h-screen bg-gray-50/50 pt-20">
       {/* Header */}
       <div className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
               <h1 className="text-4xl font-bold text-[var(--heading)] tracking-tight">Dashboard</h1>
@@ -271,7 +271,7 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+      <div className="px-4 sm:px-6 lg:px-8 py-10">
         {/* Financial Summary Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5 mb-10">
           {/* Total Invoices */}

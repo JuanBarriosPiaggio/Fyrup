@@ -39,10 +39,6 @@ export default function Header() {
             <Link href="/" className="text-white hover:text-[var(--accent)] transition-colors text-sm font-semibold uppercase tracking-wide">
               Home
             </Link>
-            
-            <Link href="/dashboard" className="text-white hover:text-[var(--accent)] transition-colors text-sm font-semibold uppercase tracking-wide">
-              Dashboard
-            </Link>
 
             {/* About Dropdown */}
             <div className="relative group">
@@ -120,10 +116,6 @@ export default function Header() {
           <div className="px-4 py-6 space-y-4">
             <Link href="/" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white hover:text-[var(--accent)] font-semibold uppercase">
               Home
-            </Link>
-            
-            <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white hover:text-[var(--accent)] font-semibold uppercase">
-              Dashboard
             </Link>
 
             <div className="space-y-2">
