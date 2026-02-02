@@ -32,9 +32,12 @@ import {
 
 export default function Dashboard() {
   const [dateFilter, setDateFilter] = useState('30');
+  const [selectedMonth, setSelectedMonth] = useState<string>(new Date().toISOString().slice(0, 7)); // YYYY-MM
   const [selectedBranch, setSelectedBranch] = useState('all');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showInvoiceDetails, setShowInvoiceDetails] = useState(false);
+  const [selectedInvoiceType, setSelectedInvoiceType] = useState<'outstanding' | 'overdue' | null>(null);
   
   // Real data state
   const [invoices, setInvoices] = useState<any[]>([]);
@@ -130,23 +133,46 @@ export default function Dashboard() {
       type: 'critical' as const, 
       count: invoiceMetrics.overdue.count, 
       text: 'Invoices overdue > 30 days', 
-      value: formatCurrency(invoiceMetrics.overdue.amount)
+      value: formatCurrency(invoiceMetrics.overdue.amount),
+      onClick: () => {
+        setSelectedInvoiceType('overdue');
+        setShowInvoiceDetails(true);
+      }
     },
     { 
       id: 2, 
       type: 'warning' as const, 
-      count: quoteMetrics.pending.count, 
-      text: 'Quotes pending > 7 days', 
-      value: formatCurrency(quoteMetrics.pending.amount)
+      count: invoiceMetrics.outstanding.count, 
+      text: 'Outstanding invoices', 
+      value: formatCurrency(invoiceMetrics.outstanding.amount),
+      onClick: () => {
+        setSelectedInvoiceType('outstanding');
+        setShowInvoiceDetails(true);
+      }
     },
     { 
       id: 3, 
       type: 'info' as const, 
-      count: 0, // Would need to match jobs to invoices
-      text: 'Jobs completed but not invoiced', 
-      value: '£0'
+      count: quoteMetrics.pending.count, 
+      text: 'Quotes pending > 7 days', 
+      value: formatCurrency(quoteMetrics.pending.amount),
+      onClick: () => {}
     }
   ];
+
+  // Get filtered invoices for detail view
+  const getFilteredInvoices = () => {
+    if (selectedInvoiceType === 'overdue') {
+      return invoices.filter(inv => {
+        if (inv.IsPaid) return false;
+        const daysDiff = Math.floor((new Date().getTime() - new Date(inv.DateIssued).getTime()) / (1000 * 60 * 60 * 24));
+        return daysDiff > 30;
+      });
+    } else if (selectedInvoiceType === 'outstanding') {
+      return invoices.filter(inv => !inv.IsPaid);
+    }
+    return [];
+  };
 
   // Show loading state
   if (loading) {
@@ -180,27 +206,48 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
+    <div className="min-h-screen bg-gray-50/50 pt-20">
       {/* Header */}
-      <div className="bg-white border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="bg-gradient-to-r from-white to-gray-50 border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-              <h1 className="text-3xl font-bold text-[var(--heading)]">Business Health Snapshot</h1>
-              <p className="text-gray-600 mt-1">Real-time metrics from Simpro</p>
+              <h1 className="text-4xl font-bold text-[var(--heading)] tracking-tight">Dashboard</h1>
+              <p className="text-gray-500 mt-2 text-sm">Real-time business metrics • Last updated: {new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</p>
             </div>
             
             <div className="flex flex-wrap items-center gap-3">
-              {/* Date Filter */}
+              {/* Month Selector */}
+              <input
+                type="month"
+                value={selectedMonth}
+                onChange={(e) => {
+                  setSelectedMonth(e.target.value);
+                  // Calculate days in selected month for API filter
+                  const monthStart = new Date(e.target.value + '-01');
+                  const today = new Date();
+                  const daysDiff = Math.floor((today.getTime() - monthStart.getTime()) / (1000 * 60 * 60 * 24));
+                  setDateFilter(daysDiff.toString());
+                }}
+                className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
+              />
+
+              {/* Quick Date Filter */}
               <select 
                 value={dateFilter}
-                onChange={(e) => setDateFilter(e.target.value)}
+                onChange={(e) => {
+                  setDateFilter(e.target.value);
+                  // Reset month selector when using quick filters
+                  if (['7', '30', '90'].includes(e.target.value)) {
+                    const date = new Date();
+                    setSelectedMonth(date.toISOString().slice(0, 7));
+                  }
+                }}
                 className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
               >
                 <option value="7">Last 7 days</option>
                 <option value="30">Last 30 days</option>
                 <option value="90">Last 90 days</option>
-                <option value="custom">Custom range</option>
               </select>
 
               {/* Branch Filter */}
@@ -224,9 +271,9 @@ export default function Dashboard() {
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         {/* Financial Summary Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5 mb-10">
           {/* Total Invoices */}
           <MetricCard
             title="Total Invoices"
@@ -283,9 +330,9 @@ export default function Dashboard() {
         </div>
 
         {/* Alerts Section */}
-        <div className="mb-8">
-          <h2 className="text-xl font-bold text-[var(--heading)] mb-4">Actionable Insights</h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="mb-10">
+          <h2 className="text-2xl font-bold text-[var(--heading)] mb-6 tracking-tight">Actionable Insights</h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {alerts.map((alert) => (
               <AlertCard key={alert.id} alert={alert} />
             ))}
@@ -293,10 +340,10 @@ export default function Dashboard() {
         </div>
 
         {/* Charts & Tables Row */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mb-10">
           {/* Invoice Status Distribution */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-bold text-[var(--heading)] mb-4">Invoice Status</h3>
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-shadow">
+            <h3 className="text-xl font-bold text-[var(--heading)] mb-6 tracking-tight">Invoice Status</h3>
             <div className="flex items-center justify-center h-64">
               <div className="relative">
                 <svg className="w-48 h-48 transform -rotate-90">
@@ -332,8 +379,8 @@ export default function Dashboard() {
           </div>
 
           {/* Quote to Job Funnel */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-bold text-[var(--heading)] mb-4">Conversion Funnel</h3>
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-shadow">
+            <h3 className="text-xl font-bold text-[var(--heading)] mb-6 tracking-tight">Conversion Funnel</h3>
             <div className="space-y-4">
               {conversionFunnel.map((step, index) => (
                 <FunnelStep 
@@ -348,11 +395,11 @@ export default function Dashboard() {
         </div>
 
         {/* Recent Jobs & Top Estimators */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           {/* Recent Jobs Table */}
-          <div className="lg:col-span-2 bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold text-[var(--heading)]">Recent Jobs</h3>
+          <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-shadow">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold text-[var(--heading)] tracking-tight">Recent Jobs</h3>
               <Link href="#" className="text-sm font-medium text-[var(--primary)] hover:text-[var(--primary-hover)]">
                 View all
               </Link>
@@ -394,8 +441,8 @@ export default function Dashboard() {
           </div>
 
           {/* Top Estimators */}
-          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h3 className="text-lg font-bold text-[var(--heading)] mb-4">Top Estimators</h3>
+          <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-shadow">
+            <h3 className="text-xl font-bold text-[var(--heading)] mb-6 tracking-tight">Top Estimators</h3>
             <div className="space-y-4">
               {topEstimatorsData.length > 0 ? (
                 topEstimatorsData.map((estimator, index) => (
@@ -424,13 +471,163 @@ export default function Dashboard() {
         </div>
 
         {/* KPIs Footer */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mt-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-5 mt-10">
           <KPICard label="Avg Days to Pay" value={avgDaysToPay.toFixed(1)} unit="days" trend="down" />
           <KPICard label="Quote Response Time" value="N/A" unit="" trend="up" />
           <KPICard label="Job Completion Rate" value={jobCompletionRate.toString()} unit="%" trend="up" />
           <KPICard label="Customer Satisfaction" value="N/A" unit="" trend="up" />
         </div>
       </div>
+
+      {/* Invoice Details Modal */}
+      {showInvoiceDetails && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
+              <div>
+                <h2 className="text-2xl font-bold text-[var(--heading)]">
+                  {selectedInvoiceType === 'overdue' ? 'Overdue Invoices' : 'Outstanding Invoices'}
+                </h2>
+                <p className="text-sm text-gray-600 mt-1">
+                  {getFilteredInvoices().length} invoice{getFilteredInvoices().length !== 1 ? 's' : ''} • 
+                  Total: {formatCurrency(getFilteredInvoices().reduce((sum, inv) => sum + (inv.Total?.IncTax || inv.Total?.ExTax || 0), 0))}
+                </p>
+              </div>
+              <button
+                onClick={() => setShowInvoiceDetails(false)}
+                className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+              >
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="grid gap-4">
+                {getFilteredInvoices().map((invoice) => {
+                  const daysSinceIssued = Math.floor((new Date().getTime() - new Date(invoice.DateIssued).getTime()) / (1000 * 60 * 60 * 24));
+                  const customerName = invoice.Customer?.CompanyName || 
+                                      (invoice.Customer?.GivenName && invoice.Customer?.FamilyName 
+                                        ? `${invoice.Customer.GivenName} ${invoice.Customer.FamilyName}` 
+                                        : 'Unknown Customer');
+                  
+                  return (
+                    <div key={invoice.ID} className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
+                      <div className="flex items-start justify-between">
+                        {/* Invoice Info */}
+                        <div className="flex-1">
+                          <div className="flex items-center gap-3 mb-3">
+                            <span className="text-lg font-bold text-[var(--primary)]">
+                              Invoice #{invoice.ID}
+                            </span>
+                            {daysSinceIssued > 30 && (
+                              <span className="px-3 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full">
+                                {daysSinceIssued} days overdue
+                              </span>
+                            )}
+                          </div>
+
+                          {/* Customer Details */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                              <div className="text-xs font-semibold text-gray-500 uppercase mb-1">Customer</div>
+                              <div className="font-semibold text-gray-900">{customerName}</div>
+                              {invoice.Customer?.ID && (
+                                <div className="text-sm text-gray-600">ID: {invoice.Customer.ID}</div>
+                              )}
+                            </div>
+                            <div>
+                              <div className="text-xs font-semibold text-gray-500 uppercase mb-1">Issue Date</div>
+                              <div className="font-medium text-gray-900">
+                                {new Date(invoice.DateIssued).toLocaleDateString('en-GB', { 
+                                  day: 'numeric', 
+                                  month: 'long', 
+                                  year: 'numeric' 
+                                })}
+                              </div>
+                              <div className="text-sm text-gray-600">{daysSinceIssued} days ago</div>
+                            </div>
+                          </div>
+
+                          {/* Financial Details */}
+                          <div className="grid grid-cols-3 gap-4 pt-4 border-t border-gray-100">
+                            <div>
+                              <div className="text-xs font-semibold text-gray-500 uppercase mb-1">Amount Ex Tax</div>
+                              <div className="text-lg font-bold text-gray-900">
+                                {formatCurrency(invoice.Total?.ExTax || 0)}
+                              </div>
+                            </div>
+                            <div>
+                              <div className="text-xs font-semibold text-gray-500 uppercase mb-1">Tax</div>
+                              <div className="text-lg font-bold text-gray-900">
+                                {formatCurrency((invoice.Total?.IncTax || 0) - (invoice.Total?.ExTax || 0))}
+                              </div>
+                            </div>
+                            <div>
+                              <div className="text-xs font-semibold text-gray-500 uppercase mb-1">Total Inc Tax</div>
+                              <div className="text-lg font-bold text-[var(--primary)]">
+                                {formatCurrency(invoice.Total?.IncTax || invoice.Total?.ExTax || 0)}
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Status */}
+                          <div className="mt-4">
+                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
+                              invoice.Status?.Name ? 'bg-gray-100 text-gray-700' : 'bg-yellow-100 text-yellow-700'
+                            }`}>
+                              {invoice.Status?.Name || 'Unpaid'}
+                            </span>
+                          </div>
+                        </div>
+
+                        {/* Actions */}
+                        <div className="ml-4 flex flex-col gap-2">
+                          <button className="px-4 py-2 bg-[var(--primary)] text-white text-sm font-semibold rounded-lg hover:bg-[var(--primary-hover)] transition-colors">
+                            View in Simpro
+                          </button>
+                          <button className="px-4 py-2 border border-gray-300 text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-50 transition-colors">
+                            Send Reminder
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+
+              {getFilteredInvoices().length === 0 && (
+                <div className="text-center py-12">
+                  <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">All Clear!</h3>
+                  <p className="text-gray-600">
+                    {selectedInvoiceType === 'overdue' 
+                      ? 'No overdue invoices at the moment.' 
+                      : 'No outstanding invoices at the moment.'}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3">
+              <button
+                onClick={() => setShowInvoiceDetails(false)}
+                className="px-4 py-2 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                Close
+              </button>
+              <button className="px-4 py-2 bg-[var(--primary)] text-white font-semibold rounded-lg hover:bg-[var(--primary-hover)] transition-colors inline-flex items-center">
+                <Download className="h-4 w-4 mr-2" />
+                Export List
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -453,10 +650,10 @@ interface MetricCardProps {
 
 function MetricCard({ title, value, amount, change, trend, subtitle, suffix, icon, variant = 'default' }: MetricCardProps) {
   const variants: Record<MetricCardVariant, string> = {
-    default: 'bg-gray-50',
-    primary: 'bg-[var(--primary)]/5',
-    success: 'bg-green-50',
-    warning: 'bg-yellow-50'
+    default: 'bg-gradient-to-br from-gray-50 to-gray-100',
+    primary: 'bg-gradient-to-br from-[var(--primary)]/10 to-[var(--primary)]/5',
+    success: 'bg-gradient-to-br from-green-50 to-green-100',
+    warning: 'bg-gradient-to-br from-yellow-50 to-yellow-100'
   };
 
   const iconVariants: Record<MetricCardVariant, string> = {
@@ -467,23 +664,25 @@ function MetricCard({ title, value, amount, change, trend, subtitle, suffix, ico
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
-      <div className="flex items-center justify-between mb-4">
-        <div className={`p-3 rounded-lg ${variants[variant]}`}>
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg hover:border-gray-200 transition-all duration-300 group">
+      <div className="flex items-start justify-between mb-6">
+        <div className={`p-4 rounded-xl ${variants[variant]} group-hover:scale-110 transition-transform duration-300`}>
           <div className={iconVariants[variant]}>{icon}</div>
         </div>
-        <div className={`flex items-center text-sm font-semibold ${trend === 'up' ? 'text-green-600' : 'text-red-600'}`}>
-          {trend === 'up' ? <TrendingUp className="h-4 w-4 mr-1" /> : <TrendingDown className="h-4 w-4 mr-1" />}
+        <div className={`flex items-center px-3 py-1.5 rounded-full text-xs font-bold ${
+          trend === 'up' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+        }`}>
+          {trend === 'up' ? <TrendingUp className="h-3.5 w-3.5 mr-1" /> : <TrendingDown className="h-3.5 w-3.5 mr-1" />}
           {change > 0 ? '+' : ''}{change}%
         </div>
       </div>
       <div>
-        <div className="text-sm font-medium text-gray-600 mb-1">{title}</div>
-        <div className="text-2xl font-bold text-[var(--heading)]">
+        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">{title}</div>
+        <div className="text-3xl font-bold text-[var(--heading)] mb-1">
           {value}{suffix}
         </div>
-        {amount && <div className="text-sm font-semibold text-gray-700 mt-1">{amount}</div>}
-        {subtitle && <div className="text-xs text-gray-500 mt-1">{subtitle}</div>}
+        {amount && <div className="text-base font-semibold text-gray-600 mt-2">{amount}</div>}
+        {subtitle && <div className="text-xs text-gray-500 mt-2">{subtitle}</div>}
       </div>
     </div>
   );
@@ -497,6 +696,7 @@ interface Alert {
   count: number;
   text: string;
   value: string;
+  onClick?: () => void;
 }
 
 interface AlertCardProps {
@@ -505,28 +705,33 @@ interface AlertCardProps {
 
 function AlertCard({ alert }: AlertCardProps) {
   const variants: Record<AlertType, string> = {
-    critical: 'bg-red-50 border-red-200 text-red-700',
-    warning: 'bg-yellow-50 border-yellow-200 text-yellow-700',
-    info: 'bg-blue-50 border-blue-200 text-blue-700'
+    critical: 'bg-gradient-to-br from-red-50 to-red-100/50 border-red-200/60 text-red-700',
+    warning: 'bg-gradient-to-br from-[var(--primary)]/10 to-[var(--primary)]/5 border-[var(--primary)]/20 text-[var(--primary-dark)]',
+    info: 'bg-gradient-to-br from-blue-50 to-blue-100/50 border-blue-200/60 text-blue-700'
   };
 
   const iconVariants: Record<AlertType, string> = {
     critical: 'text-red-600',
-    warning: 'text-yellow-600',
+    warning: 'text-[var(--primary)]',
     info: 'text-blue-600'
   };
 
   return (
-    <div className={`rounded-xl border-2 p-6 ${variants[alert.type]}`}>
-      <div className="flex items-start justify-between mb-3">
-        <AlertCircle className={`h-6 w-6 ${iconVariants[alert.type]}`} />
-        <span className="px-3 py-1 bg-white rounded-full text-sm font-bold">{alert.count}</span>
+    <div 
+      className={`rounded-2xl border-2 p-6 ${variants[alert.type]} cursor-pointer transition-all hover:shadow-xl hover:scale-[1.02] duration-300 group`}
+      onClick={alert.onClick}
+    >
+      <div className="flex items-start justify-between mb-4">
+        <div className="p-3 bg-white rounded-xl shadow-sm group-hover:shadow-md transition-shadow">
+          <AlertCircle className={`h-6 w-6 ${iconVariants[alert.type]}`} />
+        </div>
+        <span className="px-4 py-2 bg-white rounded-full text-sm font-bold shadow-sm">{alert.count}</span>
       </div>
-      <div className="font-semibold mb-2">{alert.text}</div>
-      <div className="text-2xl font-bold mb-3">{alert.value}</div>
-      <button className="text-sm font-semibold hover:underline inline-flex items-center">
+      <div className="font-semibold text-sm mb-3 uppercase tracking-wide">{alert.text}</div>
+      <div className="text-3xl font-bold mb-4">{alert.value}</div>
+      <button className="text-sm font-semibold hover:underline inline-flex items-center group-hover:gap-2 transition-all">
         View Details
-        <ArrowRight className="h-4 w-4 ml-1" />
+        <ArrowRight className="h-4 w-4 ml-1 group-hover:translate-x-1 transition-transform" />
       </button>
     </div>
   );
@@ -585,18 +790,22 @@ interface KPICardProps {
 
 function KPICard({ label, value, unit, trend }: KPICardProps) {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-      <div className="text-sm font-medium text-gray-600 mb-2">{label}</div>
+    <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 hover:shadow-lg transition-all duration-300 group">
+      <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-3">{label}</div>
       <div className="flex items-end justify-between">
         <div>
           <span className="text-3xl font-bold text-[var(--heading)]">{value}</span>
-          <span className="text-lg text-gray-600 ml-1">{unit}</span>
+          <span className="text-base text-gray-500 ml-1">{unit}</span>
         </div>
-        {trend === 'down' ? (
-          <TrendingDown className="h-5 w-5 text-green-600" />
-        ) : (
-          <TrendingUp className="h-5 w-5 text-green-600" />
-        )}
+        <div className={`p-2 rounded-xl transition-colors ${
+          trend === 'down' ? 'bg-green-50 group-hover:bg-green-100' : 'bg-green-50 group-hover:bg-green-100'
+        }`}>
+          {trend === 'down' ? (
+            <TrendingDown className="h-5 w-5 text-green-600" />
+          ) : (
+            <TrendingUp className="h-5 w-5 text-green-600" />
+          )}
+        </div>
       </div>
     </div>
   );
