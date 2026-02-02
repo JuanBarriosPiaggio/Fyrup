@@ -437,15 +437,29 @@ export default function Dashboard() {
 
 // Reusable Components
 
-function MetricCard({ title, value, amount, change, trend, subtitle, suffix, icon, variant = 'default' }: any) {
-  const variants = {
+type MetricCardVariant = 'default' | 'primary' | 'success' | 'warning';
+
+interface MetricCardProps {
+  title: string;
+  value: number | string;
+  amount?: string;
+  change: number;
+  trend: 'up' | 'down';
+  subtitle?: string;
+  suffix?: string;
+  icon: React.ReactNode;
+  variant?: MetricCardVariant;
+}
+
+function MetricCard({ title, value, amount, change, trend, subtitle, suffix, icon, variant = 'default' }: MetricCardProps) {
+  const variants: Record<MetricCardVariant, string> = {
     default: 'bg-gray-50',
     primary: 'bg-[var(--primary)]/5',
     success: 'bg-green-50',
     warning: 'bg-yellow-50'
   };
 
-  const iconVariants = {
+  const iconVariants: Record<MetricCardVariant, string> = {
     default: 'text-gray-600',
     primary: 'text-[var(--primary)]',
     success: 'text-green-600',
@@ -475,14 +489,28 @@ function MetricCard({ title, value, amount, change, trend, subtitle, suffix, ico
   );
 }
 
-function AlertCard({ alert }: any) {
-  const variants = {
+type AlertType = 'critical' | 'warning' | 'info';
+
+interface Alert {
+  id: number;
+  type: AlertType;
+  count: number;
+  text: string;
+  value: string;
+}
+
+interface AlertCardProps {
+  alert: Alert;
+}
+
+function AlertCard({ alert }: AlertCardProps) {
+  const variants: Record<AlertType, string> = {
     critical: 'bg-red-50 border-red-200 text-red-700',
     warning: 'bg-yellow-50 border-yellow-200 text-yellow-700',
     info: 'bg-blue-50 border-blue-200 text-blue-700'
   };
 
-  const iconVariants = {
+  const iconVariants: Record<AlertType, string> = {
     critical: 'text-red-600',
     warning: 'text-yellow-600',
     info: 'text-blue-600'
@@ -504,7 +532,13 @@ function AlertCard({ alert }: any) {
   );
 }
 
-function FunnelStep({ label, value, percentage }: any) {
+interface FunnelStepProps {
+  label: string;
+  value: number;
+  percentage: number;
+}
+
+function FunnelStep({ label, value, percentage }: FunnelStepProps) {
   return (
     <div>
       <div className="flex items-center justify-between text-sm mb-2">
@@ -522,22 +556,34 @@ function FunnelStep({ label, value, percentage }: any) {
   );
 }
 
-function StatusBadge({ status }: any) {
-  const variants: any = {
+interface StatusBadgeProps {
+  status: string;
+}
+
+function StatusBadge({ status }: StatusBadgeProps) {
+  const variants: Record<string, string> = {
     completed: 'bg-green-100 text-green-800',
     'in-progress': 'bg-blue-100 text-blue-800',
     overdue: 'bg-red-100 text-red-800',
-    scheduled: 'bg-purple-100 text-purple-800'
+    scheduled: 'bg-purple-100 text-purple-800',
+    complete: 'bg-green-100 text-green-800'
   };
 
   return (
-    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${variants[status]}`}>
+    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${variants[status] || 'bg-gray-100 text-gray-800'}`}>
       {status.replace('-', ' ')}
     </span>
   );
 }
 
-function KPICard({ label, value, unit, trend }: any) {
+interface KPICardProps {
+  label: string;
+  value: string;
+  unit: string;
+  trend: 'up' | 'down';
+}
+
+function KPICard({ label, value, unit, trend }: KPICardProps) {
   return (
     <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
       <div className="text-sm font-medium text-gray-600 mb-2">{label}</div>
