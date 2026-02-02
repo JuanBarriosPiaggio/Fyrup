@@ -1,12 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { 
-  TrendingUp, 
-  TrendingDown, 
-  FileText, 
-  DollarSign, 
-  Clock, 
+import {
+  TrendingUp,
+  TrendingDown,
+  FileText,
+  DollarSign,
+  Clock,
   CheckCircle,
   AlertCircle,
   Calendar,
@@ -39,9 +39,10 @@ export default function Dashboard() {
   const [showInvoiceDetails, setShowInvoiceDetails] = useState(false);
   const [selectedInvoiceType, setSelectedInvoiceType] = useState<'outstanding' | 'overdue' | null>(null);
   const [showAllJobs, setShowAllJobs] = useState(false);
-  
+
   // Real data state
   const [invoices, setInvoices] = useState<any[]>([]);
+  const [allInvoices, setAllInvoices] = useState<any[]>([]); // For overdue calculations
   const [quotes, setQuotes] = useState<any[]>([]);
   const [jobs, setJobs] = useState<any[]>([]);
 
@@ -52,23 +53,27 @@ export default function Dashboard() {
       setError(null);
       
       try {
-        const [invoicesRes, quotesRes, jobsRes] = await Promise.all([
+        // Fetch filtered data for metrics and ALL invoices for overdue calculations
+        const [invoicesRes, allInvoicesRes, quotesRes, jobsRes] = await Promise.all([
           fetch(`/api/simpro/invoices?filter=${dateFilter}`),
+          fetch(`/api/simpro/invoices?filter=365`), // Get last year for overdue calculations
           fetch(`/api/simpro/quotes?filter=${dateFilter}`),
           fetch(`/api/simpro/jobs?filter=${dateFilter}`)
         ]);
 
-        if (!invoicesRes.ok || !quotesRes.ok || !jobsRes.ok) {
+        if (!invoicesRes.ok || !allInvoicesRes.ok || !quotesRes.ok || !jobsRes.ok) {
           throw new Error('Failed to fetch data from Simpro');
         }
 
-        const [invoicesData, quotesData, jobsData] = await Promise.all([
+        const [invoicesData, allInvoicesData, quotesData, jobsData] = await Promise.all([
           invoicesRes.json(),
+          allInvoicesRes.json(),
           quotesRes.json(),
           jobsRes.json()
         ]);
 
         setInvoices(invoicesData);
+        setAllInvoices(allInvoicesData);
         setQuotes(quotesData);
         setJobs(jobsData);
       } catch (err: any) {
@@ -84,6 +89,7 @@ export default function Dashboard() {
 
   // Calculate metrics from real data
   const invoiceMetrics = calculateInvoiceMetrics(invoices);
+  const allTimeInvoiceMetrics = calculateInvoiceMetrics(allInvoices); // For overdue calculations
   const quoteMetrics = calculateQuoteMetrics(quotes);
   const recentJobsData = getRecentJobs(jobs, 5);
   const topEstimatorsData = calculateTopEstimators(quotes, 5);
@@ -94,36 +100,36 @@ export default function Dashboard() {
 
   // Format metrics for display (using dummy trends for now - would need historical data)
   const metrics = {
-    totalInvoices: { 
-      value: invoiceMetrics.total.count, 
-      change: 12.5, 
-      trend: 'up' as const, 
-      amount: formatCurrency(invoiceMetrics.total.amount) 
+    totalInvoices: {
+      value: invoiceMetrics.total.count,
+      change: 12.5,
+      trend: 'up' as const,
+      amount: formatCurrency(invoiceMetrics.total.amount)
     },
-    outstanding: { 
-      value: invoiceMetrics.outstanding.count, 
-      change: 8.2, 
-      trend: 'down' as const, 
+    outstanding: {
+      value: invoiceMetrics.outstanding.count,
+      change: 8.2,
+      trend: 'down' as const,
       amount: formatCurrency(invoiceMetrics.outstanding.amount),
       overdue: invoiceMetrics.overdue.count
     },
-    paid: { 
-      value: invoiceMetrics.paid.count, 
-      change: 15.3, 
-      trend: 'up' as const, 
+    paid: {
+      value: invoiceMetrics.paid.count,
+      change: 15.3,
+      trend: 'up' as const,
       amount: formatCurrency(invoiceMetrics.paid.amount)
     },
-    quoteValue: { 
-      value: quoteMetrics.open.count, 
-      change: 22.1, 
-      trend: 'up' as const, 
+    quoteValue: {
+      value: quoteMetrics.open.count,
+      change: 22.1,
+      trend: 'up' as const,
       amount: formatCurrency(quoteMetrics.open.amount)
     },
-    acceptanceRate: { 
-      value: Math.round(quoteMetrics.acceptanceRate), 
-      change: 5.4, 
-      trend: 'up' as const, 
-      suffix: '%' 
+    acceptanceRate: {
+      value: Math.round(quoteMetrics.acceptanceRate),
+      change: 5.4,
+      trend: 'up' as const,
+      suffix: '%'
     }
   };
 
@@ -132,9 +138,9 @@ export default function Dashboard() {
     { 
       id: 1, 
       type: 'critical' as const, 
-      count: invoiceMetrics.overdue.count, 
-      text: 'Invoices overdue > 30 days', 
-      value: formatCurrency(invoiceMetrics.overdue.amount),
+      count: allTimeInvoiceMetrics.overdue.count, // Use all-time data for overdue
+      text: 'Invoices overdue > 30 days (all time)', 
+      value: formatCurrency(allTimeInvoiceMetrics.overdue.amount),
       onClick: () => {
         setSelectedInvoiceType('overdue');
         setShowInvoiceDetails(true);
@@ -143,34 +149,34 @@ export default function Dashboard() {
     { 
       id: 2, 
       type: 'warning' as const, 
-      count: invoiceMetrics.outstanding.count, 
-      text: 'Outstanding invoices', 
-      value: formatCurrency(invoiceMetrics.outstanding.amount),
+      count: allTimeInvoiceMetrics.outstanding.count, // Use all-time data for outstanding
+      text: 'Outstanding invoices (all time)', 
+      value: formatCurrency(allTimeInvoiceMetrics.outstanding.amount),
       onClick: () => {
         setSelectedInvoiceType('outstanding');
         setShowInvoiceDetails(true);
       }
     },
-    { 
-      id: 3, 
-      type: 'info' as const, 
-      count: quoteMetrics.pending.count, 
-      text: 'Quotes pending > 7 days', 
+    {
+      id: 3,
+      type: 'info' as const,
+      count: quoteMetrics.pending.count,
+      text: 'Quotes pending > 7 days',
       value: formatCurrency(quoteMetrics.pending.amount),
-      onClick: () => {}
+      onClick: () => { }
     }
   ];
 
-  // Get filtered invoices for detail view
+  // Get filtered invoices for detail view (use allInvoices for all-time data)
   const getFilteredInvoices = () => {
     if (selectedInvoiceType === 'overdue') {
-      return invoices.filter(inv => {
+      return allInvoices.filter(inv => {
         if (inv.IsPaid) return false;
         const daysDiff = Math.floor((new Date().getTime() - new Date(inv.DateIssued).getTime()) / (1000 * 60 * 60 * 24));
         return daysDiff > 30;
       });
     } else if (selectedInvoiceType === 'outstanding') {
-      return invoices.filter(inv => !inv.IsPaid);
+      return allInvoices.filter(inv => !inv.IsPaid);
     }
     return [];
   };
@@ -195,7 +201,7 @@ export default function Dashboard() {
           <AlertCircle className="h-12 w-12 text-red-500 mx-auto" />
           <h2 className="mt-4 text-xl font-bold text-gray-900">Error Loading Dashboard</h2>
           <p className="mt-2 text-gray-600">{error}</p>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="mt-4 px-4 py-2 bg-[var(--primary)] text-white rounded-lg hover:bg-[var(--primary-hover)]"
           >
@@ -216,7 +222,7 @@ export default function Dashboard() {
               <h1 className="text-4xl font-bold text-[var(--heading)] tracking-tight">Dashboard</h1>
               <p className="text-gray-500 mt-2 text-sm">Real-time business metrics • Last updated: {new Date().toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })}</p>
             </div>
-            
+
             <div className="flex flex-wrap items-center gap-3">
               {/* Month Selector */}
               <input
@@ -234,7 +240,7 @@ export default function Dashboard() {
               />
 
               {/* Quick Date Filter */}
-              <select 
+              <select
                 value={dateFilter}
                 onChange={(e) => {
                   setDateFilter(e.target.value);
@@ -252,7 +258,7 @@ export default function Dashboard() {
               </select>
 
               {/* Branch Filter */}
-              <select 
+              <select
                 value={selectedBranch}
                 onChange={(e) => setSelectedBranch(e.target.value)}
                 className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[var(--primary)]"
@@ -384,11 +390,11 @@ export default function Dashboard() {
             <h3 className="text-xl font-bold text-[var(--heading)] mb-6 tracking-tight">Conversion Funnel</h3>
             <div className="space-y-4">
               {conversionFunnel.map((step, index) => (
-                <FunnelStep 
+                <FunnelStep
                   key={index}
-                  label={step.label} 
-                  value={step.value} 
-                  percentage={Math.round(step.percentage)} 
+                  label={step.label}
+                  value={step.value}
+                  percentage={Math.round(step.percentage)}
                 />
               ))}
             </div>
@@ -401,7 +407,7 @@ export default function Dashboard() {
           <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-[var(--heading)] tracking-tight">Recent Jobs</h3>
-              <button 
+              <button
                 onClick={() => setShowAllJobs(true)}
                 className="text-sm font-medium text-[var(--primary)] hover:text-[var(--primary-hover)] transition-colors"
               >
@@ -491,11 +497,12 @@ export default function Dashboard() {
             <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
               <div>
                 <h2 className="text-2xl font-bold text-[var(--heading)]">
-                  {selectedInvoiceType === 'overdue' ? 'Overdue Invoices' : 'Outstanding Invoices'}
+                  {selectedInvoiceType === 'overdue' ? 'Overdue Invoices (All Time)' : 'Outstanding Invoices (All Time)'}
                 </h2>
                 <p className="text-sm text-gray-600 mt-1">
                   {getFilteredInvoices().length} invoice{getFilteredInvoices().length !== 1 ? 's' : ''} • 
                   Total: {formatCurrency(getFilteredInvoices().reduce((sum, inv) => sum + (inv.Total?.IncTax || inv.Total?.ExTax || 0), 0))}
+                  {selectedInvoiceType === 'overdue' && ' • Unpaid for 30+ days'}
                 </p>
               </div>
               <button
@@ -513,11 +520,11 @@ export default function Dashboard() {
               <div className="grid gap-4">
                 {getFilteredInvoices().map((invoice) => {
                   const daysSinceIssued = Math.floor((new Date().getTime() - new Date(invoice.DateIssued).getTime()) / (1000 * 60 * 60 * 24));
-                  const customerName = invoice.Customer?.CompanyName || 
-                                      (invoice.Customer?.GivenName && invoice.Customer?.FamilyName 
-                                        ? `${invoice.Customer.GivenName} ${invoice.Customer.FamilyName}` 
-                                        : 'Unknown Customer');
-                  
+                  const customerName = invoice.Customer?.CompanyName ||
+                    (invoice.Customer?.GivenName && invoice.Customer?.FamilyName
+                      ? `${invoice.Customer.GivenName} ${invoice.Customer.FamilyName}`
+                      : 'Unknown Customer');
+
                   return (
                     <div key={invoice.ID} className="bg-white border border-gray-200 rounded-xl p-6 hover:shadow-md transition-shadow">
                       <div className="flex items-start justify-between">
@@ -546,10 +553,10 @@ export default function Dashboard() {
                             <div>
                               <div className="text-xs font-semibold text-gray-500 uppercase mb-1">Issue Date</div>
                               <div className="font-medium text-gray-900">
-                                {new Date(invoice.DateIssued).toLocaleDateString('en-GB', { 
-                                  day: 'numeric', 
-                                  month: 'long', 
-                                  year: 'numeric' 
+                                {new Date(invoice.DateIssued).toLocaleDateString('en-GB', {
+                                  day: 'numeric',
+                                  month: 'long',
+                                  year: 'numeric'
                                 })}
                               </div>
                               <div className="text-sm text-gray-600">{daysSinceIssued} days ago</div>
@@ -580,9 +587,8 @@ export default function Dashboard() {
 
                           {/* Status */}
                           <div className="mt-4">
-                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${
-                              invoice.Status?.Name ? 'bg-gray-100 text-gray-700' : 'bg-yellow-100 text-yellow-700'
-                            }`}>
+                            <span className={`px-3 py-1 rounded-full text-xs font-semibold ${invoice.Status?.Name ? 'bg-gray-100 text-gray-700' : 'bg-yellow-100 text-yellow-700'
+                              }`}>
                               {invoice.Status?.Name || 'Unpaid'}
                             </span>
                           </div>
@@ -608,8 +614,8 @@ export default function Dashboard() {
                   <CheckCircle className="h-16 w-16 text-[var(--primary)] mx-auto mb-4" />
                   <h3 className="text-xl font-bold text-gray-900 mb-2">All Clear!</h3>
                   <p className="text-gray-600">
-                    {selectedInvoiceType === 'overdue' 
-                      ? 'No overdue invoices at the moment.' 
+                    {selectedInvoiceType === 'overdue'
+                      ? 'No overdue invoices at the moment.'
                       : 'No outstanding invoices at the moment.'}
                   </p>
                 </div>
@@ -672,10 +678,10 @@ export default function Dashboard() {
                   <tbody className="text-sm divide-y divide-gray-200">
                     {jobs.map((job) => {
                       const daysSinceIssued = Math.floor((new Date().getTime() - new Date(job.DateIssued).getTime()) / (1000 * 60 * 60 * 24));
-                      const customerName = job.Customer?.CompanyName || 
-                                          (job.Customer?.GivenName && job.Customer?.FamilyName 
-                                            ? `${job.Customer.GivenName} ${job.Customer.FamilyName}` 
-                                            : 'Unknown Customer');
+                      const customerName = job.Customer?.CompanyName ||
+                        (job.Customer?.GivenName && job.Customer?.FamilyName
+                          ? `${job.Customer.GivenName} ${job.Customer.FamilyName}`
+                          : 'Unknown Customer');
                       const statusName = typeof job.Status === 'object' ? job.Status.Name : job.Status;
                       const statusLower = statusName?.toLowerCase() || 'unknown';
 
@@ -762,9 +768,8 @@ function MetricCard({ title, value, amount, change, trend, subtitle, suffix, ico
         <div className={`p-4 rounded-xl ${variants[variant]} group-hover:scale-110 transition-transform duration-300`}>
           <div className={iconVariants[variant]}>{icon}</div>
         </div>
-        <div className={`flex items-center px-3 py-1.5 rounded-full text-xs font-bold ${
-          trend === 'up' ? 'bg-[var(--primary)]/10 text-[var(--primary)]' : 'bg-[var(--primary)]/10 text-[var(--primary)]'
-        }`}>
+        <div className={`flex items-center px-3 py-1.5 rounded-full text-xs font-bold ${trend === 'up' ? 'bg-[var(--primary)]/10 text-[var(--primary)]' : 'bg-[var(--primary)]/10 text-[var(--primary)]'
+          }`}>
           {trend === 'up' ? <TrendingUp className="h-3.5 w-3.5 mr-1" /> : <TrendingDown className="h-3.5 w-3.5 mr-1" />}
           {change > 0 ? '+' : ''}{change}%
         </div>
@@ -810,7 +815,7 @@ function AlertCard({ alert }: AlertCardProps) {
   };
 
   return (
-    <div 
+    <div
       className={`rounded-2xl border-2 p-6 ${variants[alert.type]} cursor-pointer transition-all hover:shadow-xl hover:scale-[1.02] duration-300 group`}
       onClick={alert.onClick}
     >
@@ -844,7 +849,7 @@ function FunnelStep({ label, value, percentage }: FunnelStepProps) {
         <span className="font-bold text-[var(--heading)]">{value}</span>
       </div>
       <div className="w-full bg-gray-200 rounded-full h-3 overflow-hidden">
-        <div 
+        <div
           className="bg-[var(--primary)] h-3 rounded-full transition-all"
           style={{ width: `${percentage}%` }}
         />
