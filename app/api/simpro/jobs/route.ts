@@ -8,7 +8,7 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const dateFilter = searchParams.get('filter') || '30';
-    
+
     const response = await fetch(
       `${SIMPRO_API_URL}/companies/${COMPANY_ID}/jobs/?pageSize=250&columns=ID,Status,Customer,Total,DateIssued`,
       {
@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
     }
 
     const data = await response.json();
-    
+
     // Filter by date range
     const startDate = getStartDate(dateFilter);
     const filteredData = data.filter((job: any) => {
@@ -47,8 +47,8 @@ export async function GET(request: NextRequest) {
 function getStartDate(filter: string): Date {
   const today = new Date();
   const startDate = new Date(today);
-  
-  switch(filter) {
+
+  switch (filter) {
     case '7':
       startDate.setDate(today.getDate() - 7);
       break;
@@ -61,6 +61,6 @@ function getStartDate(filter: string): Date {
     default:
       startDate.setDate(today.getDate() - 30);
   }
-  
+
   return startDate;
 }
