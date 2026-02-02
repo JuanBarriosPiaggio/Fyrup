@@ -20,6 +20,24 @@ Next.js website with business intelligence dashboard and N8N workflow automation
 
 ## Quick Start
 
+### Environment Setup (Required)
+
+1. **Copy environment template:**
+   ```bash
+   cp .env.example .env.local
+   ```
+
+2. **Fill in your Simpro credentials in `.env.local`:**
+   ```env
+   SIMPRO_API_URL=https://your-subdomain.simprosuite.com/api/v1.0
+   SIMPRO_API_TOKEN=your_api_token_here
+   SIMPRO_COMPANY_ID=0
+   ```
+
+3. **For Railway deployment:**
+   - Set these same variables in Railway's environment variables dashboard
+   - Never commit `.env.local` to version control
+
 ### For Dashboard
 ```bash
 npm install
@@ -52,7 +70,7 @@ A modern business intelligence dashboard displaying real-time metrics from Simpr
 - Key performance indicators
 
 **Features:**
-- ✅ **Live Simpro API integration** - Real data from fyrup.simprosuite.com
+- ✅ **Live Simpro API integration** - Real data from your Simpro instance
 - Clean SaaS-style UI inspired by modern design principles
 - Date range filtering (7/30/90 days)
 - Branch/team filtering

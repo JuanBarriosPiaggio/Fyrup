@@ -51,7 +51,7 @@ export default function Dashboard() {
     async function fetchData() {
       setLoading(true);
       setError(null);
-      
+
       try {
         // Fetch filtered data for metrics and ALL invoices for overdue calculations
         const [invoicesRes, allInvoicesRes, quotesRes, jobsRes] = await Promise.all([
@@ -135,22 +135,22 @@ export default function Dashboard() {
 
   // Calculate alerts from real data
   const alerts = [
-    { 
-      id: 1, 
-      type: 'critical' as const, 
+    {
+      id: 1,
+      type: 'critical' as const,
       count: allTimeInvoiceMetrics.overdue.count, // Use all-time data for overdue
-      text: 'Invoices overdue > 30 days (all time)', 
+      text: 'Invoices overdue > 30 days (all time)',
       value: formatCurrency(allTimeInvoiceMetrics.overdue.amount),
       onClick: () => {
         setSelectedInvoiceType('overdue');
         setShowInvoiceDetails(true);
       }
     },
-    { 
-      id: 2, 
-      type: 'warning' as const, 
+    {
+      id: 2,
+      type: 'warning' as const,
       count: allTimeInvoiceMetrics.outstanding.count, // Use all-time data for outstanding
-      text: 'Outstanding invoices (all time)', 
+      text: 'Outstanding invoices (all time)',
       value: formatCurrency(allTimeInvoiceMetrics.outstanding.amount),
       onClick: () => {
         setSelectedInvoiceType('outstanding');
@@ -500,7 +500,7 @@ export default function Dashboard() {
                   {selectedInvoiceType === 'overdue' ? 'Overdue Invoices (All Time)' : 'Outstanding Invoices (All Time)'}
                 </h2>
                 <p className="text-sm text-gray-600 mt-1">
-                  {getFilteredInvoices().length} invoice{getFilteredInvoices().length !== 1 ? 's' : ''} • 
+                  {getFilteredInvoices().length} invoice{getFilteredInvoices().length !== 1 ? 's' : ''} •
                   Total: {formatCurrency(getFilteredInvoices().reduce((sum, inv) => sum + (inv.Total?.IncTax || inv.Total?.ExTax || 0), 0))}
                   {selectedInvoiceType === 'overdue' && ' • Unpaid for 30+ days'}
                 </p>

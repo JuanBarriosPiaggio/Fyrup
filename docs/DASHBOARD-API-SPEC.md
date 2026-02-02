@@ -12,12 +12,12 @@ All API calls require Bearer token authentication:
 
 ```javascript
 const headers = {
-  'Authorization': 'Bearer c035c60b6a535c7f515627cd15fd76d4a7a25231',
+  'Authorization': `Bearer ${process.env.SIMPRO_API_TOKEN}`,
   'Content-Type': 'application/json',
   'Accept': 'application/json'
 };
 
-const BASE_URL = 'https://fyrup.simprosuite.com/api/v1.0/companies/0';
+const BASE_URL = `${process.env.SIMPRO_API_URL}/companies/${process.env.SIMPRO_COMPANY_ID}`;
 ```
 
 ---

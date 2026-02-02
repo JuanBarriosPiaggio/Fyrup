@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const SIMPRO_API_URL = 'https://fyrup.simprosuite.com/api/v1.0';
-const SIMPRO_TOKEN = 'c035c60b6a535c7f515627cd15fd76d4a7a25231';
-const COMPANY_ID = '0';
+const SIMPRO_API_URL = process.env.SIMPRO_API_URL;
+const SIMPRO_TOKEN = process.env.SIMPRO_API_TOKEN;
+const COMPANY_ID = process.env.SIMPRO_COMPANY_ID;
 
 export async function GET(request: NextRequest) {
   try {

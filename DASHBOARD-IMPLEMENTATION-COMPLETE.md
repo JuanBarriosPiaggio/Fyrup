@@ -12,7 +12,7 @@ Your business intelligence dashboard is now **100% operational** with real-time 
 - **Invoices API** - Connected to `/companies/0/invoices/`
 - **Quotes API** - Connected to `/companies/0/quotes/`
 - **Jobs API** - Connected to `/companies/0/jobs/`
-- **Authentication** - Bearer token: `c035c60b6a535c7f515627cd15fd76d4a7a25231`
+- **Authentication** - Bearer token stored in Railway environment variables
 - **Company ID** - `0` (Fyrup)
 
 ### ✅ Real-Time Metrics Displaying
@@ -292,8 +292,10 @@ const rate = (completed.length / jobs.length) × 100;
 ### Recommended Next Steps
 1. **Move to Environment Variables**
 ```env
-# .env.local
-SIMPRO_API_TOKEN=c035c60b6a535c7f515627cd15fd76d4a7a25231
+# .env.local (copy from .env.example)
+SIMPRO_API_URL=https://your-subdomain.simprosuite.com/api/v1.0
+SIMPRO_API_TOKEN=your_api_token_here
+SIMPRO_COMPANY_ID=0
 ```
 
 2. **Update API Routes**
