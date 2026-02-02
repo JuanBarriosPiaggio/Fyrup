@@ -38,6 +38,7 @@ export default function Dashboard() {
   const [error, setError] = useState<string | null>(null);
   const [showInvoiceDetails, setShowInvoiceDetails] = useState(false);
   const [selectedInvoiceType, setSelectedInvoiceType] = useState<'outstanding' | 'overdue' | null>(null);
+  const [showAllJobs, setShowAllJobs] = useState(false);
   
   // Real data state
   const [invoices, setInvoices] = useState<any[]>([]);
@@ -293,7 +294,7 @@ export default function Dashboard() {
             trend={metrics.outstanding.trend}
             subtitle={`${metrics.outstanding.overdue} overdue`}
             icon={<Clock className="h-6 w-6" />}
-            variant="warning"
+            variant="primary"
           />
 
           {/* Paid */}
@@ -304,7 +305,7 @@ export default function Dashboard() {
             change={metrics.paid.change}
             trend={metrics.paid.trend}
             icon={<CheckCircle className="h-6 w-6" />}
-            variant="success"
+            variant="primary"
           />
 
           {/* Quote Value */}
@@ -400,9 +401,12 @@ export default function Dashboard() {
           <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-8 hover:shadow-md transition-shadow">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-[var(--heading)] tracking-tight">Recent Jobs</h3>
-              <Link href="#" className="text-sm font-medium text-[var(--primary)] hover:text-[var(--primary-hover)]">
+              <button 
+                onClick={() => setShowAllJobs(true)}
+                className="text-sm font-medium text-[var(--primary)] hover:text-[var(--primary-hover)] transition-colors"
+              >
                 View all
-              </Link>
+              </button>
             </div>
             <div className="overflow-x-auto">
               <table className="w-full">
@@ -524,7 +528,7 @@ export default function Dashboard() {
                               Invoice #{invoice.ID}
                             </span>
                             {daysSinceIssued > 30 && (
-                              <span className="px-3 py-1 bg-red-100 text-red-700 text-xs font-semibold rounded-full">
+                              <span className="px-3 py-1 bg-[var(--primary)]/20 text-[var(--primary)] text-xs font-semibold rounded-full">
                                 {daysSinceIssued} days overdue
                               </span>
                             )}
@@ -601,7 +605,7 @@ export default function Dashboard() {
 
               {getFilteredInvoices().length === 0 && (
                 <div className="text-center py-12">
-                  <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+                  <CheckCircle className="h-16 w-16 text-[var(--primary)] mx-auto mb-4" />
                   <h3 className="text-xl font-bold text-gray-900 mb-2">All Clear!</h3>
                   <p className="text-gray-600">
                     {selectedInvoiceType === 'overdue' 
@@ -628,13 +632,106 @@ export default function Dashboard() {
           </div>
         </div>
       )}
+
+      {/* All Jobs Modal */}
+      {showAllJobs && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+            {/* Modal Header */}
+            <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between bg-gray-50">
+              <div>
+                <h2 className="text-2xl font-bold text-[var(--heading)]">All Jobs</h2>
+                <p className="text-sm text-gray-600 mt-1">
+                  {jobs.length} job{jobs.length !== 1 ? 's' : ''} found
+                </p>
+              </div>
+              <button
+                onClick={() => setShowAllJobs(false)}
+                className="p-2 hover:bg-gray-200 rounded-lg transition-colors"
+              >
+                <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Modal Content */}
+            <div className="flex-1 overflow-y-auto p-6">
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead className="text-left text-xs font-semibold text-gray-600 uppercase bg-gray-50">
+                    <tr>
+                      <th className="px-4 py-3">Job ID</th>
+                      <th className="px-4 py-3">Client</th>
+                      <th className="px-4 py-3">Status</th>
+                      <th className="px-4 py-3">Value</th>
+                      <th className="px-4 py-3">Issue Date</th>
+                      <th className="px-4 py-3">Days Open</th>
+                    </tr>
+                  </thead>
+                  <tbody className="text-sm divide-y divide-gray-200">
+                    {jobs.map((job) => {
+                      const daysSinceIssued = Math.floor((new Date().getTime() - new Date(job.DateIssued).getTime()) / (1000 * 60 * 60 * 24));
+                      const customerName = job.Customer?.CompanyName || 
+                                          (job.Customer?.GivenName && job.Customer?.FamilyName 
+                                            ? `${job.Customer.GivenName} ${job.Customer.FamilyName}` 
+                                            : 'Unknown Customer');
+                      const statusName = typeof job.Status === 'object' ? job.Status.Name : job.Status;
+                      const statusLower = statusName?.toLowerCase() || 'unknown';
+
+                      return (
+                        <tr key={job.ID} className="hover:bg-gray-50">
+                          <td className="px-4 py-3 font-medium text-[var(--primary)]">J-{job.ID}</td>
+                          <td className="px-4 py-3 text-gray-900">{customerName}</td>
+                          <td className="px-4 py-3">
+                            <StatusBadge status={statusLower} />
+                          </td>
+                          <td className="px-4 py-3 font-semibold text-gray-900">
+                            {formatCurrency(job.Total?.IncTax || 0)}
+                          </td>
+                          <td className="px-4 py-3 text-gray-600">
+                            {new Date(job.DateIssued).toLocaleDateString('en-GB')}
+                          </td>
+                          <td className="px-4 py-3 text-gray-600">{daysSinceIssued}d</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+
+              {jobs.length === 0 && (
+                <div className="text-center py-12">
+                  <Briefcase className="h-16 w-16 text-gray-400 mx-auto mb-4" />
+                  <h3 className="text-xl font-bold text-gray-900 mb-2">No Jobs Found</h3>
+                  <p className="text-gray-600">There are no jobs in the selected period.</p>
+                </div>
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-6 py-4 border-t border-gray-200 bg-gray-50 flex justify-end gap-3">
+              <button
+                onClick={() => setShowAllJobs(false)}
+                className="px-4 py-2 border border-gray-300 text-gray-700 font-semibold rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                Close
+              </button>
+              <button className="px-4 py-2 bg-[var(--primary)] text-white font-semibold rounded-lg hover:bg-[var(--primary-hover)] transition-colors inline-flex items-center">
+                <Download className="h-4 w-4 mr-2" />
+                Export List
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
 
 // Reusable Components
 
-type MetricCardVariant = 'default' | 'primary' | 'success' | 'warning';
+type MetricCardVariant = 'default' | 'primary';
 
 interface MetricCardProps {
   title: string;
@@ -651,16 +748,12 @@ interface MetricCardProps {
 function MetricCard({ title, value, amount, change, trend, subtitle, suffix, icon, variant = 'default' }: MetricCardProps) {
   const variants: Record<MetricCardVariant, string> = {
     default: 'bg-gradient-to-br from-gray-50 to-gray-100',
-    primary: 'bg-gradient-to-br from-[var(--primary)]/10 to-[var(--primary)]/5',
-    success: 'bg-gradient-to-br from-green-50 to-green-100',
-    warning: 'bg-gradient-to-br from-yellow-50 to-yellow-100'
+    primary: 'bg-gradient-to-br from-[var(--primary)]/10 to-[var(--primary)]/5'
   };
 
   const iconVariants: Record<MetricCardVariant, string> = {
     default: 'text-gray-600',
-    primary: 'text-[var(--primary)]',
-    success: 'text-green-600',
-    warning: 'text-yellow-600'
+    primary: 'text-[var(--primary)]'
   };
 
   return (
@@ -670,7 +763,7 @@ function MetricCard({ title, value, amount, change, trend, subtitle, suffix, ico
           <div className={iconVariants[variant]}>{icon}</div>
         </div>
         <div className={`flex items-center px-3 py-1.5 rounded-full text-xs font-bold ${
-          trend === 'up' ? 'bg-green-50 text-green-700' : 'bg-red-50 text-red-700'
+          trend === 'up' ? 'bg-[var(--primary)]/10 text-[var(--primary)]' : 'bg-[var(--primary)]/10 text-[var(--primary)]'
         }`}>
           {trend === 'up' ? <TrendingUp className="h-3.5 w-3.5 mr-1" /> : <TrendingDown className="h-3.5 w-3.5 mr-1" />}
           {change > 0 ? '+' : ''}{change}%
@@ -705,15 +798,15 @@ interface AlertCardProps {
 
 function AlertCard({ alert }: AlertCardProps) {
   const variants: Record<AlertType, string> = {
-    critical: 'bg-gradient-to-br from-red-50 to-red-100/50 border-red-200/60 text-red-700',
-    warning: 'bg-gradient-to-br from-[var(--primary)]/10 to-[var(--primary)]/5 border-[var(--primary)]/20 text-[var(--primary-dark)]',
-    info: 'bg-gradient-to-br from-blue-50 to-blue-100/50 border-blue-200/60 text-blue-700'
+    critical: 'bg-gradient-to-br from-[var(--primary)]/15 to-[var(--primary)]/5 border-[var(--primary)]/30 text-[var(--heading)]',
+    warning: 'bg-gradient-to-br from-[var(--primary)]/10 to-[var(--primary)]/5 border-[var(--primary)]/20 text-[var(--heading)]',
+    info: 'bg-gradient-to-br from-[var(--primary)]/10 to-[var(--primary)]/5 border-[var(--primary)]/20 text-[var(--heading)]'
   };
 
   const iconVariants: Record<AlertType, string> = {
-    critical: 'text-red-600',
+    critical: 'text-[var(--primary)]',
     warning: 'text-[var(--primary)]',
-    info: 'text-blue-600'
+    info: 'text-[var(--primary)]'
   };
 
   return (
@@ -767,15 +860,15 @@ interface StatusBadgeProps {
 
 function StatusBadge({ status }: StatusBadgeProps) {
   const variants: Record<string, string> = {
-    completed: 'bg-green-100 text-green-800',
-    'in-progress': 'bg-blue-100 text-blue-800',
-    overdue: 'bg-red-100 text-red-800',
-    scheduled: 'bg-purple-100 text-purple-800',
-    complete: 'bg-green-100 text-green-800'
+    completed: 'bg-[var(--primary)]/10 text-[var(--primary)]',
+    'in-progress': 'bg-[var(--primary)]/20 text-[var(--primary)]',
+    overdue: 'bg-[var(--primary)]/15 text-[var(--primary)]',
+    scheduled: 'bg-[var(--primary)]/10 text-[var(--primary)]',
+    complete: 'bg-[var(--primary)]/10 text-[var(--primary)]'
   };
 
   return (
-    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${variants[status] || 'bg-gray-100 text-gray-800'}`}>
+    <span className={`px-3 py-1 rounded-full text-xs font-semibold ${variants[status] || 'bg-gray-100 text-gray-600'}`}>
       {status.replace('-', ' ')}
     </span>
   );
@@ -797,13 +890,11 @@ function KPICard({ label, value, unit, trend }: KPICardProps) {
           <span className="text-3xl font-bold text-[var(--heading)]">{value}</span>
           <span className="text-base text-gray-500 ml-1">{unit}</span>
         </div>
-        <div className={`p-2 rounded-xl transition-colors ${
-          trend === 'down' ? 'bg-green-50 group-hover:bg-green-100' : 'bg-green-50 group-hover:bg-green-100'
-        }`}>
+        <div className="p-2 rounded-xl transition-colors bg-[var(--primary)]/10 group-hover:bg-[var(--primary)]/20">
           {trend === 'down' ? (
-            <TrendingDown className="h-5 w-5 text-green-600" />
+            <TrendingDown className="h-5 w-5 text-[var(--primary)]" />
           ) : (
-            <TrendingUp className="h-5 w-5 text-green-600" />
+            <TrendingUp className="h-5 w-5 text-[var(--primary)]" />
           )}
         </div>
       </div>
