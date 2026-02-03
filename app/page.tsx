@@ -134,7 +134,7 @@ export default function Home() {
                 <label className="block text-sm font-bold text-dark-900 mb-2 uppercase">Company</label>
                 <input
                   type="text"
-                  className="w-full px-4 py-3 border-2 border-gray-300 focus:border-primary-600 focus:outline-none text-dark-900 bg-white font-medium"
+                  className="w-full px-4 py-3 border-2 border-gray-300 focus:border-[var(--primary)] focus:outline-none text-dark-900 bg-white font-medium"
                 />
               </div>
 
@@ -161,7 +161,7 @@ export default function Home() {
                 <label className="block text-sm font-bold text-dark-900 mb-2 uppercase">Inspection Address</label>
                 <input
                   type="text"
-                  className="w-full px-4 py-3 border-2 border-gray-300 focus:border-primary-600 focus:outline-none text-dark-900 bg-white font-medium"
+                  className="w-full px-4 py-3 border-2 border-gray-300 focus:border-[var(--primary)] focus:outline-none text-dark-900 bg-white font-medium"
                   required
                 />
               </div>
@@ -171,7 +171,7 @@ export default function Home() {
                 <input
                   type="number"
                   min="0"
-                  className="w-full px-4 py-3 border-2 border-gray-300 focus:border-primary-600 focus:outline-none text-dark-900 bg-white font-medium"
+                  className="w-full px-4 py-3 border-2 border-gray-300 focus:border-[var(--primary)] focus:outline-none text-dark-900 bg-white font-medium"
                   required
                 />
               </div>
@@ -180,7 +180,7 @@ export default function Home() {
                 <label className="block text-sm font-bold text-dark-900 mb-2 uppercase">Message</label>
                 <textarea
                   rows={4}
-                  className="w-full px-4 py-3 border-2 border-gray-300 focus:border-primary-600 focus:outline-none text-dark-900 bg-white font-medium"
+                  className="w-full px-4 py-3 border-2 border-gray-300 focus:border-[var(--primary)] focus:outline-none text-dark-900 bg-white font-medium"
                 ></textarea>
               </div>
 

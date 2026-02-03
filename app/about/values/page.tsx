@@ -12,7 +12,7 @@ export default function ValuesPage() {
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-dark-900">
                 <div className="max-w-4xl mx-auto text-center">
-                    <div className="inline-block mb-4 px-6 py-2 bg-primary-600 text-white text-sm font-bold uppercase tracking-wider">
+                    <div className="inline-block mb-4 px-6 py-2 bg-[var(--primary)] text-white text-sm font-bold uppercase tracking-wider">
                         Our Foundation
                     </div>
                     <h1 className="text-6xl lg:text-7xl text-white mb-6 font-bold uppercase">
@@ -28,7 +28,7 @@ export default function ValuesPage() {
             <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-100">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-16">
-                        <div className="inline-block mb-4 px-6 py-2 bg-primary-600 text-white text-sm font-bold uppercase tracking-wider">
+                        <div className="inline-block mb-4 px-6 py-2 bg-[var(--primary)] text-white text-sm font-bold uppercase tracking-wider">
                             Core Values
                         </div>
                         <h2 className="text-4xl lg:text-6xl text-dark-900 mb-8 font-bold uppercase">HOPP: Our Core Values</h2>
@@ -40,8 +40,8 @@ export default function ValuesPage() {
 
                     <div className="grid md:grid-cols-2 gap-8">
                         {/* Honest */}
-                        <div className="bg-white p-10 border-l-8 border-primary-600 shadow-lg hover:shadow-2xl transition-all">
-                            <div className="bg-primary-600 p-4 inline-block mb-6">
+                        <div className="bg-white p-10 border-l-8 border-[var(--primary)] shadow-lg hover:shadow-2xl transition-all">
+                            <div className="bg-[var(--primary)] p-4 inline-block mb-6">
                                 <Heart className="h-10 w-10 text-white" />
                             </div>
                             <h3 className="text-4xl font-bold text-dark-900 mb-6 uppercase">
@@ -55,8 +55,8 @@ export default function ValuesPage() {
                         </div>
 
                         {/* Open */}
-                        <div className="bg-white p-10 border-l-8 border-primary-600 shadow-lg hover:shadow-2xl transition-all">
-                            <div className="bg-primary-600 p-4 inline-block mb-6">
+                        <div className="bg-white p-10 border-l-8 border-[var(--primary)] shadow-lg hover:shadow-2xl transition-all">
+                            <div className="bg-[var(--primary)] p-4 inline-block mb-6">
                                 <Users className="h-10 w-10 text-white" />
                             </div>
                             <h3 className="text-4xl font-bold text-dark-900 mb-6 uppercase">
@@ -70,8 +70,8 @@ export default function ValuesPage() {
                         </div>
 
                         {/* Professional */}
-                        <div className="bg-white p-10 border-l-8 border-primary-600 shadow-lg hover:shadow-2xl transition-all">
-                            <div className="bg-primary-600 p-4 inline-block mb-6">
+                        <div className="bg-white p-10 border-l-8 border-[var(--primary)] shadow-lg hover:shadow-2xl transition-all">
+                            <div className="bg-[var(--primary)] p-4 inline-block mb-6">
                                 <Award className="h-10 w-10 text-white" />
                             </div>
                             <h3 className="text-4xl font-bold text-dark-900 mb-6 uppercase">
@@ -86,8 +86,8 @@ export default function ValuesPage() {
                         </div>
 
                         {/* Passionate */}
-                        <div className="bg-white p-10 border-l-8 border-primary-600 shadow-lg hover:shadow-2xl transition-all">
-                            <div className="bg-primary-600 p-4 inline-block mb-6">
+                        <div className="bg-white p-10 border-l-8 border-[var(--primary)] shadow-lg hover:shadow-2xl transition-all">
+                            <div className="bg-[var(--primary)] p-4 inline-block mb-6">
                                 <Flame className="h-10 w-10 text-white" />
                             </div>
                             <h3 className="text-4xl font-bold text-dark-900 mb-6 uppercase">
@@ -107,12 +107,12 @@ export default function ValuesPage() {
             <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
                 <div className="max-w-4xl mx-auto">
                     <div className="text-center mb-12">
-                        <div className="inline-block mb-4 px-6 py-2 bg-primary-600 text-white text-sm font-bold uppercase tracking-wider">
+                        <div className="inline-block mb-4 px-6 py-2 bg-[var(--primary)] text-white text-sm font-bold uppercase tracking-wider">
                             The Difference
                         </div>
                         <h2 className="text-4xl lg:text-5xl text-dark-900 mb-8 font-bold uppercase">Why HOPP Matters</h2>
                     </div>
-                    <div className="bg-gray-100 p-10 border-l-8 border-primary-600">
+                    <div className="bg-gray-100 p-10 border-l-8 border-[var(--primary)]">
                         <p className="text-gray-600 leading-relaxed text-lg mb-6 font-medium">
                             In an industry where safety is paramount, our values aren't just nice to have – they're essential.
                             They ensure that every fire risk assessment is thorough, every fire door is inspected meticulously,
@@ -136,7 +136,7 @@ export default function ValuesPage() {
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link
                             href="/contact"
-                            className="inline-flex items-center justify-center bg-primary-600 text-white px-10 py-5 text-lg font-bold uppercase tracking-wide hover:bg-primary-700 transition-all shadow-2xl"
+                            className="inline-flex items-center justify-center bg-[var(--primary)] text-white px-10 py-5 text-lg font-bold uppercase tracking-wide hover:bg-[var(--primary-hover)] transition-all shadow-2xl"
                         >
                             Get In Touch
                             <ArrowRight className="ml-3 h-6 w-6" />

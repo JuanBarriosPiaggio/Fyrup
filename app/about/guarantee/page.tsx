@@ -13,9 +13,9 @@ export default function GuaranteePage() {
             <section className="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-dark-900">
                 <div className="max-w-4xl mx-auto text-center">
                     <div className="inline-block mb-6">
-                        <Shield className="h-20 w-20 text-primary-600 mx-auto" />
+                        <Shield className="h-20 w-20 text-[var(--primary)] mx-auto" />
                     </div>
-                    <div className="inline-block mb-4 px-6 py-2 bg-primary-600 text-white text-sm font-bold uppercase tracking-wider">
+                    <div className="inline-block mb-4 px-6 py-2 bg-[var(--primary)] text-white text-sm font-bold uppercase tracking-wider">
                         Our Promise
                     </div>
                     <h1 className="text-6xl lg:text-7xl text-white mb-6 font-bold uppercase">
@@ -31,7 +31,7 @@ export default function GuaranteePage() {
             <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-100">
                 <div className="max-w-7xl mx-auto">
                     <div className="text-center mb-16">
-                        <div className="inline-block mb-4 px-6 py-2 bg-primary-600 text-white text-sm font-bold uppercase tracking-wider">
+                        <div className="inline-block mb-4 px-6 py-2 bg-[var(--primary)] text-white text-sm font-bold uppercase tracking-wider">
                             Our Commitment
                         </div>
                         <h2 className="text-4xl lg:text-6xl text-dark-900 mb-8 font-bold uppercase">The Fyrup Guarantee</h2>
@@ -43,8 +43,8 @@ export default function GuaranteePage() {
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                         {/* Quality Assurance */}
-                        <div className="bg-white p-8 border-l-4 border-primary-600 text-center hover:shadow-lg transition-all">
-                            <div className="bg-primary-600 p-4 inline-block mb-6">
+                        <div className="bg-white p-8 border-l-4 border-[var(--primary)] text-center hover:shadow-lg transition-all">
+                            <div className="bg-[var(--primary)] p-4 inline-block mb-6">
                                 <CheckCircle className="h-10 w-10 text-white" />
                             </div>
                             <h3 className="text-xl font-bold text-dark-900 mb-4 uppercase">Quality Assurance</h3>
@@ -54,8 +54,8 @@ export default function GuaranteePage() {
                         </div>
 
                         {/* Timely Service */}
-                        <div className="bg-white p-8 border-l-4 border-primary-600 text-center hover:shadow-lg transition-all">
-                            <div className="bg-primary-600 p-4 inline-block mb-6">
+                        <div className="bg-white p-8 border-l-4 border-[var(--primary)] text-center hover:shadow-lg transition-all">
+                            <div className="bg-[var(--primary)] p-4 inline-block mb-6">
                                 <Clock className="h-10 w-10 text-white" />
                             </div>
                             <h3 className="text-xl font-bold text-dark-900 mb-4 uppercase">Timely Service</h3>
@@ -65,8 +65,8 @@ export default function GuaranteePage() {
                         </div>
 
                         {/* Expert Team */}
-                        <div className="bg-white p-8 border-l-4 border-primary-600 text-center hover:shadow-lg transition-all">
-                            <div className="bg-primary-600 p-4 inline-block mb-6">
+                        <div className="bg-white p-8 border-l-4 border-[var(--primary)] text-center hover:shadow-lg transition-all">
+                            <div className="bg-[var(--primary)] p-4 inline-block mb-6">
                                 <ThumbsUp className="h-10 w-10 text-white" />
                             </div>
                             <h3 className="text-xl font-bold text-dark-900 mb-4 uppercase">Expert Team</h3>
@@ -76,8 +76,8 @@ export default function GuaranteePage() {
                         </div>
 
                         {/* Full Support */}
-                        <div className="bg-white p-8 border-l-4 border-primary-600 text-center hover:shadow-lg transition-all">
-                            <div className="bg-primary-600 p-4 inline-block mb-6">
+                        <div className="bg-white p-8 border-l-4 border-[var(--primary)] text-center hover:shadow-lg transition-all">
+                            <div className="bg-[var(--primary)] p-4 inline-block mb-6">
                                 <Shield className="h-10 w-10 text-white" />
                             </div>
                             <h3 className="text-xl font-bold text-dark-900 mb-4 uppercase">Full Support</h3>
@@ -93,14 +93,14 @@ export default function GuaranteePage() {
             <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
                 <div className="max-w-5xl mx-auto">
                     <div className="text-center mb-12">
-                        <div className="inline-block mb-4 px-6 py-2 bg-primary-600 text-white text-sm font-bold uppercase tracking-wider">
+                        <div className="inline-block mb-4 px-6 py-2 bg-[var(--primary)] text-white text-sm font-bold uppercase tracking-wider">
                             Details
                         </div>
                         <h2 className="text-4xl lg:text-5xl text-dark-900 font-bold uppercase">What You Can Expect</h2>
                     </div>
 
                     <div className="space-y-6">
-                        <div className="bg-gray-100 p-8 border-l-8 border-primary-600 shadow-lg">
+                        <div className="bg-gray-100 p-8 border-l-8 border-[var(--primary)] shadow-lg">
                             <h3 className="text-2xl font-bold text-dark-900 mb-4 uppercase">Transparent Pricing</h3>
                             <p className="text-gray-600 leading-relaxed font-medium">
                                 We believe in complete transparency when it comes to pricing. Our quotes are detailed, comprehensive,
@@ -108,7 +108,7 @@ export default function GuaranteePage() {
                             </p>
                         </div>
 
-                        <div className="bg-gray-100 p-8 border-l-8 border-primary-600 shadow-lg">
+                        <div className="bg-gray-100 p-8 border-l-8 border-[var(--primary)] shadow-lg">
                             <h3 className="text-2xl font-bold text-dark-900 mb-4 uppercase">Comprehensive Reporting</h3>
                             <p className="text-gray-600 leading-relaxed font-medium">
                                 Every fire risk assessment, inspection, and test comes with detailed, easy-to-understand reporting.
@@ -117,7 +117,7 @@ export default function GuaranteePage() {
                             </p>
                         </div>
 
-                        <div className="bg-gray-100 p-8 border-l-8 border-primary-600 shadow-lg">
+                        <div className="bg-gray-100 p-8 border-l-8 border-[var(--primary)] shadow-lg">
                             <h3 className="text-2xl font-bold text-dark-900 mb-4 uppercase">Certified Materials & Methods</h3>
                             <p className="text-gray-600 leading-relaxed font-medium">
                                 We only use certified, tested products and follow manufacturer specifications and industry best practices.
@@ -126,7 +126,7 @@ export default function GuaranteePage() {
                             </p>
                         </div>
 
-                        <div className="bg-gray-100 p-8 border-l-8 border-primary-600 shadow-lg">
+                        <div className="bg-gray-100 p-8 border-l-8 border-[var(--primary)] shadow-lg">
                             <h3 className="text-2xl font-bold text-dark-900 mb-4 uppercase">Responsive Communication</h3>
                             <p className="text-gray-600 leading-relaxed font-medium">
                                 Questions? Concerns? We're here to help. Our team responds promptly to calls and emails, and we're always
@@ -135,7 +135,7 @@ export default function GuaranteePage() {
                             </p>
                         </div>
 
-                        <div className="bg-gray-100 p-8 border-l-8 border-primary-600 shadow-lg">
+                        <div className="bg-gray-100 p-8 border-l-8 border-[var(--primary)] shadow-lg">
                             <h3 className="text-2xl font-bold text-dark-900 mb-4 uppercase">Minimal Disruption</h3>
                             <p className="text-gray-600 leading-relaxed font-medium">
                                 We understand your business needs to keep running. Our team works efficiently and professionally to minimize
@@ -144,7 +144,7 @@ export default function GuaranteePage() {
                             </p>
                         </div>
 
-                        <div className="bg-gray-100 p-8 border-l-8 border-primary-600 shadow-lg">
+                        <div className="bg-gray-100 p-8 border-l-8 border-[var(--primary)] shadow-lg">
                             <h3 className="text-2xl font-bold text-dark-900 mb-4 uppercase">Ongoing Support</h3>
                             <p className="text-gray-600 leading-relaxed font-medium">
                                 Our relationship doesn't end when the project is complete. We provide ongoing support, annual reminders for
@@ -159,7 +159,7 @@ export default function GuaranteePage() {
             {/* Bottom Statement */}
             <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-100">
                 <div className="max-w-4xl mx-auto text-center">
-                    <Shield className="h-16 w-16 text-primary-600 mx-auto mb-8" />
+                    <Shield className="h-16 w-16 text-[var(--primary)] mx-auto mb-8" />
                     <h2 className="text-3xl lg:text-4xl text-dark-900 mb-6 font-bold uppercase">Our Promise to You</h2>
                     <p className="text-xl text-gray-600 leading-relaxed font-medium">
                         At Fyrup, we stand behind our work. If something doesn't meet your expectations or our high standards,
@@ -178,7 +178,7 @@ export default function GuaranteePage() {
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link 
                             href="/contact" 
-                            className="inline-flex items-center justify-center bg-primary-600 text-white px-10 py-5 text-lg font-bold uppercase tracking-wide hover:bg-primary-700 transition-all shadow-2xl"
+                            className="inline-flex items-center justify-center bg-[var(--primary)] text-white px-10 py-5 text-lg font-bold uppercase tracking-wide hover:bg-[var(--primary-hover)] transition-all shadow-2xl"
                         >
                             Get A Quote
                             <ArrowRight className="ml-3 h-6 w-6" />

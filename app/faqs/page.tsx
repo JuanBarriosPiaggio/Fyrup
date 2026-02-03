@@ -127,7 +127,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
             >
                 <span className="text-lg font-bold text-dark-900 pr-8 uppercase">{question}</span>
                 <ChevronDown
-                    className={`h-6 w-6 text-primary-600 flex-shrink-0 transition-transform duration-200 ${isOpen ? 'transform rotate-180' : ''
+                    className={`h-6 w-6 text-[var(--primary)] flex-shrink-0 transition-transform duration-200 ${isOpen ? 'transform rotate-180' : ''
                         }`}
                 />
             </button>
@@ -146,7 +146,7 @@ export default function FAQsPage() {
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-dark-900">
                 <div className="max-w-4xl mx-auto text-center">
-                    <div className="inline-block mb-4 px-6 py-2 bg-primary-600 text-white text-sm font-bold uppercase tracking-wider">
+                    <div className="inline-block mb-4 px-6 py-2 bg-[var(--primary)] text-white text-sm font-bold uppercase tracking-wider">
                         Support
                     </div>
                     <h1 className="text-6xl lg:text-7xl text-white mb-6 font-bold uppercase">
@@ -165,12 +165,12 @@ export default function FAQsPage() {
                         {faqs.map((category, idx) => (
                             <div key={idx}>
                                 <div className="mb-6">
-                                    <div className="inline-block px-6 py-2 bg-primary-600 text-white text-sm font-bold uppercase tracking-wider mb-2">
+                                    <div className="inline-block px-6 py-2 bg-[var(--primary)] text-white text-sm font-bold uppercase tracking-wider mb-2">
                                         {category.category}
                                     </div>
                                     <h2 className="text-3xl font-bold text-dark-900 uppercase">{category.category}</h2>
                                 </div>
-                                <div className="bg-white border-l-8 border-primary-600 overflow-hidden shadow-lg">
+                                <div className="bg-white border-l-8 border-[var(--primary)] overflow-hidden shadow-lg">
                                     {category.questions.map((faq, faqIdx) => (
                                         <FAQItem key={faqIdx} question={faq.question} answer={faq.answer} />
                                     ))}
@@ -184,7 +184,7 @@ export default function FAQsPage() {
             {/* Still Have Questions */}
             <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
                 <div className="max-w-4xl mx-auto">
-                    <div className="bg-gray-100 p-12 text-center border-l-8 border-primary-600 shadow-lg">
+                    <div className="bg-gray-100 p-12 text-center border-l-8 border-[var(--primary)] shadow-lg">
                         <h2 className="text-4xl lg:text-5xl text-dark-900 mb-6 font-bold uppercase">Still Have Questions?</h2>
                         <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto font-medium">
                             Can't find the answer you're looking for? Our friendly team is here to help.
@@ -192,7 +192,7 @@ export default function FAQsPage() {
                         <div className="flex flex-col sm:flex-row gap-4 justify-center">
                             <Link
                                 href="/contact"
-                                className="inline-flex items-center justify-center bg-primary-600 text-white px-10 py-5 text-lg font-bold uppercase tracking-wide hover:bg-primary-700 transition-all shadow-2xl"
+                                className="inline-flex items-center justify-center bg-[var(--primary)] text-white px-10 py-5 text-lg font-bold uppercase tracking-wide hover:bg-[var(--primary-hover)] transition-all shadow-2xl"
                             >
                                 Contact Us
                                 <ArrowRight className="ml-3 h-6 w-6" />
@@ -217,7 +217,7 @@ export default function FAQsPage() {
                     </p>
                     <Link
                         href="/contact"
-                        className="inline-flex items-center justify-center bg-primary-600 text-white px-10 py-5 text-lg font-bold uppercase tracking-wide hover:bg-primary-700 transition-all shadow-2xl"
+                        className="inline-flex items-center justify-center bg-[var(--primary)] text-white px-10 py-5 text-lg font-bold uppercase tracking-wide hover:bg-[var(--primary-hover)] transition-all shadow-2xl"
                     >
                         Request a Quote
                         <ArrowRight className="ml-3 h-6 w-6" />

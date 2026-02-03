@@ -34,13 +34,13 @@ export default function InsurancePage() {
       {/* Hero Section */}
       <section className="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-dark-900">
         <div className="max-w-5xl mx-auto">
-          <div className="inline-block mb-4 px-6 py-2 bg-primary-600 text-white text-sm font-bold uppercase tracking-wider">
+          <div className="inline-block mb-4 px-6 py-2 bg-[var(--primary)] text-white text-sm font-bold uppercase tracking-wider">
             Insurance & Certifications
           </div>
           <h1 className="text-4xl lg:text-6xl text-white mb-6 font-bold uppercase">
             INSURANCE &
             <br />
-            <span className="text-primary-400">CERTIFICATIONS</span>
+            <span className="text-[var(--accent)]">CERTIFICATIONS</span>
           </h1>
           <p className="text-xl text-gray-300 max-w-3xl font-medium leading-relaxed">
             We maintain comprehensive insurance coverage and industry certifications to protect our clients and ensure the highest standards of service delivery.
@@ -62,18 +62,18 @@ export default function InsurancePage() {
             {insuranceDocs.map((doc, index) => (
               <div
                 key={index}
-                className="bg-white p-8 border-l-4 border-primary-600 shadow-md hover:shadow-xl transition-shadow"
+                className="bg-white p-8 border-l-4 border-[var(--primary)] shadow-md hover:shadow-xl transition-shadow"
               >
                 <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
                   <div className="flex gap-6 flex-1">
-                    <div className="bg-primary-50 p-4 flex items-center justify-center flex-shrink-0">
-                      <FileText className="h-10 w-10 text-primary-600" />
+                    <div className="bg-[var(--primary)]/10 p-4 flex items-center justify-center flex-shrink-0">
+                      <FileText className="h-10 w-10 text-[var(--primary)]" />
                     </div>
                     <div className="flex-1">
                       <h3 className="text-2xl font-bold text-dark-900 mb-2">{doc.title}</h3>
                       <p className="text-gray-600 mb-3 font-medium">{doc.description}</p>
                       <div className="flex items-center gap-2 text-sm">
-                        <Shield className="h-4 w-4 text-primary-600" />
+                        <Shield className="h-4 w-4 text-[var(--primary)]" />
                         <span className="font-bold text-dark-900">Valid until: {doc.expires}</span>
                       </div>
                     </div>
@@ -82,7 +82,7 @@ export default function InsurancePage() {
                     href={`/insurance/${encodeURIComponent(doc.filename)}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center bg-primary-600 text-white px-8 py-4 font-bold uppercase tracking-wide hover:bg-primary-700 transition-all shadow-md whitespace-nowrap"
+                    className="inline-flex items-center justify-center bg-[var(--primary)] text-white px-8 py-4 font-bold uppercase tracking-wide hover:bg-[var(--primary-hover)] transition-all shadow-md whitespace-nowrap"
                   >
                     <Download className="h-5 w-5 mr-2" />
                     Download
@@ -99,25 +99,25 @@ export default function InsurancePage() {
         <div className="max-w-5xl mx-auto">
           <h2 className="text-3xl font-bold text-dark-900 mb-8 uppercase">Why Our Insurance Matters</h2>
           <div className="grid md:grid-cols-2 gap-8">
-            <div className="bg-gray-50 p-8 border-l-4 border-primary-600">
+            <div className="bg-gray-50 p-8 border-l-4 border-[var(--primary)]">
               <h3 className="text-xl font-bold text-dark-900 mb-4 uppercase">Client Protection</h3>
               <p className="text-gray-600 font-medium leading-relaxed">
                 Our comprehensive insurance coverage ensures that you and your property are fully protected throughout every stage of our work.
               </p>
             </div>
-            <div className="bg-gray-50 p-8 border-l-4 border-primary-600">
+            <div className="bg-gray-50 p-8 border-l-4 border-[var(--primary)]">
               <h3 className="text-xl font-bold text-dark-900 mb-4 uppercase">Industry Standards</h3>
               <p className="text-gray-600 font-medium leading-relaxed">
                 We maintain all required certifications and exceed industry standards for fire protection services in the UK.
               </p>
             </div>
-            <div className="bg-gray-50 p-8 border-l-4 border-primary-600">
+            <div className="bg-gray-50 p-8 border-l-4 border-[var(--primary)]">
               <h3 className="text-xl font-bold text-dark-900 mb-4 uppercase">Peace of Mind</h3>
               <p className="text-gray-600 font-medium leading-relaxed">
                 Work with confidence knowing that we're fully insured and certified by recognized industry bodies.
               </p>
             </div>
-            <div className="bg-gray-50 p-8 border-l-4 border-primary-600">
+            <div className="bg-gray-50 p-8 border-l-4 border-[var(--primary)]">
               <h3 className="text-xl font-bold text-dark-900 mb-4 uppercase">Compliance</h3>
               <p className="text-gray-600 font-medium leading-relaxed">
                 All our insurance policies and certifications are kept current to meet legal and regulatory requirements.
@@ -138,7 +138,7 @@ export default function InsurancePage() {
           </p>
           <Link
             href="/contact"
-            className="inline-flex items-center bg-primary-600 text-white px-10 py-5 text-lg font-bold uppercase tracking-wide hover:bg-primary-700 transition-all shadow-2xl"
+            className="inline-flex items-center bg-[var(--primary)] text-white px-10 py-5 text-lg font-bold uppercase tracking-wide hover:bg-[var(--primary-hover)] transition-all shadow-2xl"
           >
             Contact Us
           </Link>

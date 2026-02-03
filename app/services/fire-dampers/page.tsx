@@ -14,7 +14,7 @@ export default function FireDampersPage() {
         <div className="max-w-7xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <div className="bg-primary-600 p-4 inline-block mb-6">
+              <div className="bg-[var(--primary)] p-4 inline-block mb-6">
                 <Wind className="h-12 w-12 text-white" />
               </div>
               <h1 className="text-5xl lg:text-6xl text-white mb-6 font-bold leading-tight">
@@ -26,34 +26,34 @@ export default function FireDampersPage() {
               </p>
               <Link 
                 href="/contact" 
-                className="inline-flex items-center bg-primary-600 text-white px-10 py-5 text-lg font-bold uppercase tracking-wide hover:bg-primary-700 transition-all shadow-2xl"
+                className="inline-flex items-center bg-[var(--primary)] text-white px-10 py-5 text-lg font-bold uppercase tracking-wide hover:bg-[var(--primary-hover)] transition-all shadow-2xl"
               >
                 Get Fire Damper Service
                 <ArrowRight className="ml-3 h-6 w-6" />
               </Link>
             </div>
 
-            <div className="bg-white p-10 border-l-8 border-primary-600 shadow-xl">
+            <div className="bg-white p-10 border-l-8 border-[var(--primary)] shadow-xl">
               <h3 className="text-3xl font-bold text-dark-900 mb-8 uppercase">Why Fire Dampers?</h3>
               <ul className="space-y-4">
                 <li className="flex items-start">
-                  <CheckCircle className="h-6 w-6 text-primary-600 mr-3 mt-1 flex-shrink-0" />
+                  <CheckCircle className="h-6 w-6 text-[var(--primary)] mr-3 mt-1 flex-shrink-0" />
                   <span className="text-gray-600 font-medium">Prevent fire spread via ducts</span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle className="h-6 w-6 text-primary-600 mr-3 mt-1 flex-shrink-0" />
+                  <CheckCircle className="h-6 w-6 text-[var(--primary)] mr-3 mt-1 flex-shrink-0" />
                   <span className="text-gray-600 font-medium">Maintain compartmentation</span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle className="h-6 w-6 text-primary-600 mr-3 mt-1 flex-shrink-0" />
+                  <CheckCircle className="h-6 w-6 text-[var(--primary)] mr-3 mt-1 flex-shrink-0" />
                   <span className="text-gray-600 font-medium">Regulatory requirement</span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle className="h-6 w-6 text-primary-600 mr-3 mt-1 flex-shrink-0" />
+                  <CheckCircle className="h-6 w-6 text-[var(--primary)] mr-3 mt-1 flex-shrink-0" />
                   <span className="text-gray-600 font-medium">Protect building occupants</span>
                 </li>
                 <li className="flex items-start">
-                  <CheckCircle className="h-6 w-6 text-primary-600 mr-3 mt-1 flex-shrink-0" />
+                  <CheckCircle className="h-6 w-6 text-[var(--primary)] mr-3 mt-1 flex-shrink-0" />
                   <span className="text-gray-600 font-medium">Insurance compliance</span>
                 </li>
               </ul>
@@ -66,7 +66,7 @@ export default function FireDampersPage() {
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-100">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <div className="inline-block mb-4 px-6 py-2 bg-primary-600 text-white text-sm font-bold uppercase tracking-wider">
+            <div className="inline-block mb-4 px-6 py-2 bg-[var(--primary)] text-white text-sm font-bold uppercase tracking-wider">
               About Fire Dampers
             </div>
             <h2 className="text-4xl lg:text-5xl text-dark-900 mb-6 font-bold uppercase">What is a Fire Damper?</h2>
@@ -94,7 +94,7 @@ export default function FireDampersPage() {
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-16">
-            <div className="inline-block mb-4 px-6 py-2 bg-primary-600 text-white text-sm font-bold uppercase tracking-wider">
+            <div className="inline-block mb-4 px-6 py-2 bg-[var(--primary)] text-white text-sm font-bold uppercase tracking-wider">
               Our Services
             </div>
             <h2 className="text-4xl lg:text-6xl text-dark-900 mb-6 font-bold uppercase">Fire Damper Services</h2>
@@ -104,7 +104,7 @@ export default function FireDampersPage() {
           </div>
 
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-gray-100 p-8 border-l-4 border-primary-600">
+            <div className="bg-gray-100 p-8 border-l-4 border-[var(--primary)]">
               <h3 className="text-2xl font-bold text-dark-900 mb-6 uppercase">Fire Damper Testing</h3>
               <p className="text-gray-600 leading-relaxed mb-6 font-medium">
                 Annual inspection and testing to ensure all fire dampers are operational and comply with 
@@ -112,69 +112,69 @@ export default function FireDampersPage() {
               </p>
               <ul className="space-y-3 text-gray-600 font-medium">
                 <li className="flex items-start">
-                  <span className="text-primary-600 font-bold mr-3">•</span>
+                  <span className="text-[var(--primary)] font-bold mr-3">•</span>
                   <span>Visual inspection</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-primary-600 font-bold mr-3">•</span>
+                  <span className="text-[var(--primary)] font-bold mr-3">•</span>
                   <span>Drop testing</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-primary-600 font-bold mr-3">•</span>
+                  <span className="text-[var(--primary)] font-bold mr-3">•</span>
                   <span>Detailed reporting</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-primary-600 font-bold mr-3">•</span>
+                  <span className="text-[var(--primary)] font-bold mr-3">•</span>
                   <span>Certification</span>
                 </li>
               </ul>
             </div>
 
-            <div className="bg-gray-100 p-8 border-l-4 border-primary-600">
+            <div className="bg-gray-100 p-8 border-l-4 border-[var(--primary)]">
               <h3 className="text-2xl font-bold text-dark-900 mb-6 uppercase">Installation</h3>
               <p className="text-gray-600 leading-relaxed mb-6 font-medium">
                 Professional installation of fire dampers in new constructions and retrofit applications.
               </p>
               <ul className="space-y-3 text-gray-600 font-medium">
                 <li className="flex items-start">
-                  <span className="text-primary-600 font-bold mr-3">•</span>
+                  <span className="text-[var(--primary)] font-bold mr-3">•</span>
                   <span>Certified products</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-primary-600 font-bold mr-3">•</span>
+                  <span className="text-[var(--primary)] font-bold mr-3">•</span>
                   <span>Expert installation</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-primary-600 font-bold mr-3">•</span>
+                  <span className="text-[var(--primary)] font-bold mr-3">•</span>
                   <span>Compliance guaranteed</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-primary-600 font-bold mr-3">•</span>
+                  <span className="text-[var(--primary)] font-bold mr-3">•</span>
                   <span>Full documentation</span>
                 </li>
               </ul>
             </div>
 
-            <div className="bg-gray-100 p-8 border-l-4 border-primary-600">
+            <div className="bg-gray-100 p-8 border-l-4 border-[var(--primary)]">
               <h3 className="text-2xl font-bold text-dark-900 mb-6 uppercase">Maintenance & Repair</h3>
               <p className="text-gray-600 leading-relaxed mb-6 font-medium">
                 Ongoing maintenance to keep fire dampers in optimal working condition and ensure compliance.
               </p>
               <ul className="space-y-3 text-gray-600 font-medium">
                 <li className="flex items-start">
-                  <span className="text-primary-600 font-bold mr-3">•</span>
+                  <span className="text-[var(--primary)] font-bold mr-3">•</span>
                   <span>Cleaning</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-primary-600 font-bold mr-3">•</span>
+                  <span className="text-[var(--primary)] font-bold mr-3">•</span>
                   <span>Repairs</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-primary-600 font-bold mr-3">•</span>
+                  <span className="text-[var(--primary)] font-bold mr-3">•</span>
                   <span>Component replacement</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-primary-600 font-bold mr-3">•</span>
+                  <span className="text-[var(--primary)] font-bold mr-3">•</span>
                   <span>Record keeping</span>
                 </li>
               </ul>
@@ -187,14 +187,14 @@ export default function FireDampersPage() {
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-100">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
-            <div className="inline-block mb-4 px-6 py-2 bg-primary-600 text-white text-sm font-bold uppercase tracking-wider">
+            <div className="inline-block mb-4 px-6 py-2 bg-[var(--primary)] text-white text-sm font-bold uppercase tracking-wider">
               Types
             </div>
             <h2 className="text-4xl lg:text-5xl text-dark-900 font-bold uppercase">Types of Fire Dampers</h2>
           </div>
           
           <div className="space-y-6">
-            <div className="bg-white p-8 border-l-4 border-primary-600">
+            <div className="bg-white p-8 border-l-4 border-[var(--primary)]">
               <h3 className="text-2xl font-bold text-dark-900 mb-4 uppercase">Fire Dampers</h3>
               <p className="text-gray-600 leading-relaxed font-medium">
                 Standard fire dampers close automatically when exposed to high temperatures via a fusible link. 
@@ -202,7 +202,7 @@ export default function FireDampersPage() {
               </p>
             </div>
 
-            <div className="bg-white p-8 border-l-4 border-primary-600">
+            <div className="bg-white p-8 border-l-4 border-[var(--primary)]">
               <h3 className="text-2xl font-bold text-dark-900 mb-4 uppercase">Smoke Dampers</h3>
               <p className="text-gray-600 leading-relaxed font-medium">
                 Smoke dampers are designed to prevent smoke migration through ductwork. They are typically 
@@ -210,7 +210,7 @@ export default function FireDampersPage() {
               </p>
             </div>
 
-            <div className="bg-white p-8 border-l-4 border-primary-600">
+            <div className="bg-white p-8 border-l-4 border-[var(--primary)]">
               <h3 className="text-2xl font-bold text-dark-900 mb-4 uppercase">Combination Fire/Smoke Dampers</h3>
               <p className="text-gray-600 leading-relaxed font-medium">
                 These dampers provide both fire and smoke protection in a single unit. They include both 
@@ -225,40 +225,40 @@ export default function FireDampersPage() {
       <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12">
-            <div className="inline-block mb-4 px-6 py-2 bg-primary-600 text-white text-sm font-bold uppercase tracking-wider">
+            <div className="inline-block mb-4 px-6 py-2 bg-[var(--primary)] text-white text-sm font-bold uppercase tracking-wider">
               Compliance
             </div>
             <h2 className="text-4xl lg:text-5xl text-dark-900 font-bold uppercase">Testing Requirements</h2>
           </div>
-          <div className="bg-gray-100 p-10 border-l-8 border-primary-600">
+          <div className="bg-gray-100 p-10 border-l-8 border-[var(--primary)]">
             <p className="text-gray-600 mb-8 leading-relaxed font-medium">
               UK building regulations require fire dampers to be tested annually by a competent person. 
               Our testing service includes:
             </p>
             <ul className="space-y-4">
               <li className="flex items-start">
-                <CheckCircle className="h-6 w-6 text-primary-600 mr-3 flex-shrink-0 mt-1" />
+                <CheckCircle className="h-6 w-6 text-[var(--primary)] mr-3 flex-shrink-0 mt-1" />
                 <div>
                   <strong className="text-dark-900 font-bold">Visual Inspection</strong>
                   <p className="text-gray-600 mt-1 font-medium">Check for damage, corrosion, or obstruction</p>
                 </div>
               </li>
               <li className="flex items-start">
-                <CheckCircle className="h-6 w-6 text-primary-600 mr-3 flex-shrink-0 mt-1" />
+                <CheckCircle className="h-6 w-6 text-[var(--primary)] mr-3 flex-shrink-0 mt-1" />
                 <div>
                   <strong className="text-dark-900 font-bold">Drop Test</strong>
                   <p className="text-gray-600 mt-1 font-medium">Verify the damper closes correctly when the fusible link is released</p>
                 </div>
               </li>
               <li className="flex items-start">
-                <CheckCircle className="h-6 w-6 text-primary-600 mr-3 flex-shrink-0 mt-1" />
+                <CheckCircle className="h-6 w-6 text-[var(--primary)] mr-3 flex-shrink-0 mt-1" />
                 <div>
                   <strong className="text-dark-900 font-bold">Reset and Verification</strong>
                   <p className="text-gray-600 mt-1 font-medium">Reset damper and ensure proper operation</p>
                 </div>
               </li>
               <li className="flex items-start">
-                <CheckCircle className="h-6 w-6 text-primary-600 mr-3 flex-shrink-0 mt-1" />
+                <CheckCircle className="h-6 w-6 text-[var(--primary)] mr-3 flex-shrink-0 mt-1" />
                 <div>
                   <strong className="text-dark-900 font-bold">Documentation</strong>
                   <p className="text-gray-600 mt-1 font-medium">Comprehensive report and certification for building compliance</p>
@@ -279,7 +279,7 @@ export default function FireDampersPage() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Link 
               href="/contact" 
-              className="inline-flex items-center justify-center bg-primary-600 text-white px-10 py-5 text-lg font-bold uppercase tracking-wide hover:bg-primary-700 transition-all shadow-2xl"
+              className="inline-flex items-center justify-center bg-[var(--primary)] text-white px-10 py-5 text-lg font-bold uppercase tracking-wide hover:bg-[var(--primary-hover)] transition-all shadow-2xl"
             >
               Request a Quote
               <ArrowRight className="ml-3 h-6 w-6" />

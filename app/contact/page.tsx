@@ -25,7 +25,7 @@ export default function ContactPage() {
             {/* Hero Section */}
             <section className="relative pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-dark-900">
                 <div className="max-w-4xl mx-auto text-center">
-                    <div className="inline-block mb-4 px-6 py-2 bg-primary-600 text-white text-sm font-bold uppercase tracking-wider">
+                    <div className="inline-block mb-4 px-6 py-2 bg-[var(--primary)] text-white text-sm font-bold uppercase tracking-wider">
                         Let's Talk
                     </div>
                     <h1 className="text-6xl lg:text-7xl text-white mb-6 font-bold uppercase">
@@ -41,30 +41,30 @@ export default function ContactPage() {
             <section className="py-16 px-4 sm:px-6 lg:px-8 bg-gray-100">
                 <div className="max-w-6xl mx-auto">
                     <div className="grid md:grid-cols-3 gap-8">
-                        <div className="bg-white p-8 border-l-4 border-primary-600 text-center hover:shadow-lg transition-all">
-                            <div className="bg-primary-600 p-4 inline-block mb-6">
+                        <div className="bg-white p-8 border-l-4 border-[var(--primary)] text-center hover:shadow-lg transition-all">
+                            <div className="bg-[var(--primary)] p-4 inline-block mb-6">
                                 <Phone className="h-8 w-8 text-white" />
                             </div>
                             <h3 className="text-lg font-bold text-dark-900 mb-3 uppercase">Phone</h3>
-                            <a href="tel:02035762292" className="text-2xl font-bold text-dark-900 hover:text-primary-600 transition-colors">
+                            <a href="tel:02035762292" className="text-2xl font-bold text-dark-900 hover:text-[var(--primary)] transition-colors">
                                 020 3576 2292
                             </a>
                             <p className="text-gray-600 mt-2 text-sm font-medium">Mon - Fri, 9am - 6pm</p>
                         </div>
 
-                        <div className="bg-white p-8 border-l-4 border-primary-600 text-center hover:shadow-lg transition-all">
-                            <div className="bg-primary-600 p-4 inline-block mb-6">
+                        <div className="bg-white p-8 border-l-4 border-[var(--primary)] text-center hover:shadow-lg transition-all">
+                            <div className="bg-[var(--primary)] p-4 inline-block mb-6">
                                 <Mail className="h-8 w-8 text-white" />
                             </div>
                             <h3 className="text-lg font-bold text-dark-900 mb-3 uppercase">Email</h3>
-                            <a href="mailto:info@fyrup.co.uk" className="text-lg font-medium text-dark-900 hover:text-primary-600 transition-colors break-all">
+                            <a href="mailto:info@fyrup.co.uk" className="text-lg font-medium text-dark-900 hover:text-[var(--primary)] transition-colors break-all">
                                 info@fyrup.co.uk
                             </a>
                             <p className="text-gray-600 mt-2 text-sm font-medium">We'll respond within 24 hours</p>
                         </div>
 
-                        <div className="bg-white p-8 border-l-4 border-primary-600 text-center hover:shadow-lg transition-all">
-                            <div className="bg-primary-600 p-4 inline-block mb-6">
+                        <div className="bg-white p-8 border-l-4 border-[var(--primary)] text-center hover:shadow-lg transition-all">
+                            <div className="bg-[var(--primary)] p-4 inline-block mb-6">
                                 <MapPin className="h-8 w-8 text-white" />
                             </div>
                             <h3 className="text-lg font-bold text-dark-900 mb-3 uppercase">Address</h3>
@@ -81,7 +81,7 @@ export default function ContactPage() {
             <section className="py-24 px-4 sm:px-6 lg:px-8 bg-white">
                 <div className="max-w-4xl mx-auto">
                     <div className="text-center mb-12">
-                        <div className="inline-block mb-4 px-6 py-2 bg-primary-600 text-white text-sm font-bold uppercase tracking-wider">
+                        <div className="inline-block mb-4 px-6 py-2 bg-[var(--primary)] text-white text-sm font-bold uppercase tracking-wider">
                             Contact Form
                         </div>
                         <h2 className="text-4xl lg:text-5xl text-dark-900 mb-6 font-bold uppercase">Send Us a Message</h2>
@@ -90,7 +90,7 @@ export default function ContactPage() {
                         </p>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="bg-gray-100 p-10 border-l-8 border-primary-600 shadow-lg">
+                    <form onSubmit={handleSubmit} className="bg-gray-100 p-10 border-l-8 border-[var(--primary)] shadow-lg">
                         <div className="space-y-6">
                             <div className="grid md:grid-cols-2 gap-6">
                                 <div>
@@ -102,7 +102,7 @@ export default function ContactPage() {
                                         id="firstName"
                                         name="firstName"
                                         required
-                                        className="w-full px-4 py-3 border-2 border-gray-300 focus:border-primary-600 focus:outline-none text-dark-900 bg-white font-medium"
+                                        className="w-full px-4 py-3 border-2 border-gray-300 focus:border-[var(--primary)] focus:outline-none text-dark-900 bg-white font-medium"
                                     />
                                 </div>
 
@@ -115,7 +115,7 @@ export default function ContactPage() {
                                         id="lastName"
                                         name="lastName"
                                         required
-                                        className="w-full px-4 py-3 border-2 border-gray-300 focus:border-primary-600 focus:outline-none text-dark-900 bg-white font-medium"
+                                        className="w-full px-4 py-3 border-2 border-gray-300 focus:border-[var(--primary)] focus:outline-none text-dark-900 bg-white font-medium"
                                     />
                                 </div>
                             </div>
@@ -128,7 +128,7 @@ export default function ContactPage() {
                                     type="text"
                                     id="company"
                                     name="company"
-                                    className="w-full px-4 py-3 border-2 border-gray-300 focus:border-primary-600 focus:outline-none text-dark-900 bg-white font-medium"
+                                    className="w-full px-4 py-3 border-2 border-gray-300 focus:border-[var(--primary)] focus:outline-none text-dark-900 bg-white font-medium"
                                 />
                             </div>
 
@@ -142,7 +142,7 @@ export default function ContactPage() {
                                         id="email"
                                         name="email"
                                         required
-                                        className="w-full px-4 py-3 border-2 border-gray-300 focus:border-primary-600 focus:outline-none text-dark-900 bg-white font-medium"
+                                        className="w-full px-4 py-3 border-2 border-gray-300 focus:border-[var(--primary)] focus:outline-none text-dark-900 bg-white font-medium"
                                     />
                                 </div>
 
@@ -155,7 +155,7 @@ export default function ContactPage() {
                                         id="phone"
                                         name="phone"
                                         required
-                                        className="w-full px-4 py-3 border-2 border-gray-300 focus:border-primary-600 focus:outline-none text-dark-900 bg-white font-medium"
+                                        className="w-full px-4 py-3 border-2 border-gray-300 focus:border-[var(--primary)] focus:outline-none text-dark-900 bg-white font-medium"
                                     />
                                 </div>
                             </div>
@@ -169,7 +169,7 @@ export default function ContactPage() {
                                     id="address"
                                     name="address"
                                     required
-                                    className="w-full px-4 py-3 border-2 border-gray-300 focus:border-primary-600 focus:outline-none text-dark-900 bg-white font-medium"
+                                    className="w-full px-4 py-3 border-2 border-gray-300 focus:border-[var(--primary)] focus:outline-none text-dark-900 bg-white font-medium"
                                 />
                             </div>
 
@@ -181,7 +181,7 @@ export default function ContactPage() {
                                     id="service"
                                     name="service"
                                     required
-                                    className="w-full px-4 py-3 border-2 border-gray-300 focus:border-primary-600 focus:outline-none text-dark-900 bg-white font-medium"
+                                    className="w-full px-4 py-3 border-2 border-gray-300 focus:border-[var(--primary)] focus:outline-none text-dark-900 bg-white font-medium"
                                 >
                                     <option value="">Select a service...</option>
                                     <option value="fire-risk-assessment">Fire Risk Assessment</option>
@@ -201,7 +201,7 @@ export default function ContactPage() {
                                     id="propertyType"
                                     name="propertyType"
                                     required
-                                    className="w-full px-4 py-3 border-2 border-gray-300 focus:border-primary-600 focus:outline-none text-dark-900 bg-white font-medium"
+                                    className="w-full px-4 py-3 border-2 border-gray-300 focus:border-[var(--primary)] focus:outline-none text-dark-900 bg-white font-medium"
                                 >
                                     <option value="">Select property type...</option>
                                     <option value="commercial">Commercial</option>
@@ -222,14 +222,14 @@ export default function ContactPage() {
                                     rows={5}
                                     required
                                     placeholder="Please provide details about your fire protection needs..."
-                                    className="w-full px-4 py-3 border-2 border-gray-300 focus:border-primary-600 focus:outline-none text-dark-900 bg-white font-medium"
+                                    className="w-full px-4 py-3 border-2 border-gray-300 focus:border-[var(--primary)] focus:outline-none text-dark-900 bg-white font-medium"
                                 ></textarea>
                             </div>
 
                             <button
                                 type="submit"
                                 disabled={formStatus === 'submitting'}
-                                className="w-full bg-primary-600 text-white px-8 py-5 text-lg font-bold uppercase hover:bg-primary-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-xl"
+                                className="w-full bg-[var(--primary)] text-white px-8 py-5 text-lg font-bold uppercase hover:bg-[var(--primary-hover)] transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center shadow-xl"
                             >
                                 {formStatus === 'submitting' ? (
                                     'SENDING...'
@@ -252,7 +252,7 @@ export default function ContactPage() {
                     </form>
 
                     <p className="text-center text-gray-600 mt-8 text-sm font-medium">
-                        * REQUIRED FIELDS | FOR URGENT MATTERS, PLEASE CALL US AT <a href="tel:02035762292" className="font-bold text-primary-600 hover:underline">020 3576 2292</a>
+                        * REQUIRED FIELDS | FOR URGENT MATTERS, PLEASE CALL US AT <a href="tel:02035762292" className="font-bold text-[var(--primary)] hover:underline">020 3576 2292</a>
                     </p>
                 </div>
             </section>
@@ -261,38 +261,38 @@ export default function ContactPage() {
             <section className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-100">
                 <div className="max-w-6xl mx-auto">
                     <div className="grid md:grid-cols-2 gap-12">
-                        <div className="bg-white p-10 border-l-8 border-primary-600">
+                        <div className="bg-white p-10 border-l-8 border-[var(--primary)]">
                             <h2 className="text-3xl font-bold text-dark-900 mb-6 uppercase">Why Choose Fyrup?</h2>
                             <ul className="space-y-4 text-gray-600 font-medium">
                                 <li className="flex items-start">
-                                    <span className="text-primary-600 font-bold mr-3 text-xl">•</span>
+                                    <span className="text-[var(--primary)] font-bold mr-3 text-xl">•</span>
                                     <span>Over 15 years of experience in fire protection services</span>
                                 </li>
                                 <li className="flex items-start">
-                                    <span className="text-primary-600 font-bold mr-3 text-xl">•</span>
+                                    <span className="text-[var(--primary)] font-bold mr-3 text-xl">•</span>
                                     <span>Same-day quotes for all inquiries</span>
                                 </li>
                                 <li className="flex items-start">
-                                    <span className="text-primary-600 font-bold mr-3 text-xl">•</span>
+                                    <span className="text-[var(--primary)] font-bold mr-3 text-xl">•</span>
                                     <span>Fully certified and compliant with all UK fire safety regulations</span>
                                 </li>
                                 <li className="flex items-start">
-                                    <span className="text-primary-600 font-bold mr-3 text-xl">•</span>
+                                    <span className="text-[var(--primary)] font-bold mr-3 text-xl">•</span>
                                     <span>Transparent pricing with no hidden fees</span>
                                 </li>
                                 <li className="flex items-start">
-                                    <span className="text-primary-600 font-bold mr-3 text-xl">•</span>
+                                    <span className="text-[var(--primary)] font-bold mr-3 text-xl">•</span>
                                     <span>Dedicated support throughout your project</span>
                                 </li>
                             </ul>
                         </div>
 
-                        <div className="bg-white p-10 border-l-8 border-primary-600">
+                        <div className="bg-white p-10 border-l-8 border-[var(--primary)]">
                             <h2 className="text-3xl font-bold text-dark-900 mb-6 uppercase">What Happens Next?</h2>
                             <div className="space-y-6">
                                 <div>
                                     <div className="flex items-center mb-2">
-                                        <div className="w-10 h-10 bg-primary-600 text-white flex items-center justify-center font-bold text-xl mr-3">1</div>
+                                        <div className="w-10 h-10 bg-[var(--primary)] text-white flex items-center justify-center font-bold text-xl mr-3">1</div>
                                         <h3 className="font-bold text-dark-900 uppercase">We Review Your Inquiry</h3>
                                     </div>
                                     <p className="text-gray-600 ml-13 font-medium">Our team carefully reviews your requirements and property details.</p>
@@ -300,7 +300,7 @@ export default function ContactPage() {
 
                                 <div>
                                     <div className="flex items-center mb-2">
-                                        <div className="w-10 h-10 bg-primary-600 text-white flex items-center justify-center font-bold text-xl mr-3">2</div>
+                                        <div className="w-10 h-10 bg-[var(--primary)] text-white flex items-center justify-center font-bold text-xl mr-3">2</div>
                                         <h3 className="font-bold text-dark-900 uppercase">We Prepare Your Quote</h3>
                                     </div>
                                     <p className="text-gray-600 ml-13 font-medium">We create a detailed, transparent quote tailored to your specific needs.</p>
@@ -308,7 +308,7 @@ export default function ContactPage() {
 
                                 <div>
                                     <div className="flex items-center mb-2">
-                                        <div className="w-10 h-10 bg-primary-600 text-white flex items-center justify-center font-bold text-xl mr-3">3</div>
+                                        <div className="w-10 h-10 bg-[var(--primary)] text-white flex items-center justify-center font-bold text-xl mr-3">3</div>
                                         <h3 className="font-bold text-dark-900 uppercase">We Get Started</h3>
                                     </div>
                                     <p className="text-gray-600 ml-13 font-medium">Once approved, we schedule and complete your fire protection services efficiently.</p>
