@@ -66,6 +66,20 @@ html {
   animation: float 6s ease-in-out infinite;
 }
 
+/* Infinite scroll animation for accreditation banner */
+@keyframes infinite-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-infinite-scroll {
+  animation: infinite-scroll 30s linear infinite;
+}
+
 /* Elegant serif headings */
 .heading-serif {
   font-family: var(--font-playfair), Georgia, serif;

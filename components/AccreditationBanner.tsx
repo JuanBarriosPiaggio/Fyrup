@@ -14,11 +14,11 @@ export default function AccreditationBanner() {
     <div className="w-full py-8 bg-white/5 backdrop-blur-sm overflow-hidden">
       <div className="relative">
         {/* Gradient overlays for fade effect */}
-        <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-dark-900 to-transparent z-10"></div>
-        <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-dark-900 to-transparent z-10"></div>
+        <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-dark-900 to-transparent z-10 pointer-events-none"></div>
+        <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-dark-900 to-transparent z-10 pointer-events-none"></div>
         
         {/* Scrolling container */}
-        <div className="flex animate-scroll">
+        <div className="flex animate-infinite-scroll hover:[animation-play-state:paused]">
           {/* First set of logos */}
           {accreditations.map((accred, index) => (
             <div
@@ -55,25 +55,6 @@ export default function AccreditationBanner() {
           ))}
         </div>
       </div>
-      
-      <style jsx>{`
-        @keyframes scroll {
-          0% {
-            transform: translateX(0);
-          }
-          100% {
-            transform: translateX(-50%);
-          }
-        }
-        
-        .animate-scroll {
-          animation: scroll 20s linear infinite;
-        }
-        
-        .animate-scroll:hover {
-          animation-play-state: paused;
-        }
-      `}</style>
     </div>
   );
 }
