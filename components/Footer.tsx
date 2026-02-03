@@ -3,7 +3,7 @@ import { Mail, Phone, MapPin } from 'lucide-react';
 
 export default function Footer() {
   return (
-    <footer className="bg-dark-900 text-white border-t-8 border-primary-600">
+    <footer className="bg-dark-900 text-white border-t-8 border-[var(--primary)]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12">
           {/* Company Info */}
@@ -17,11 +17,11 @@ export default function Footer() {
               Leading provider of passive fire protection and fire risk assessments with over 15 years of experience.
             </p>
             <div className="space-y-3 text-sm">
-              <a href="tel:02035762292" className="flex items-center text-gray-400 hover:text-primary-600 transition-colors font-bold">
+              <a href="tel:02035762292" className="flex items-center text-gray-400 hover:text-[var(--primary)] transition-colors font-bold">
                 <Phone className="h-5 w-5 mr-2" />
                 020 3576 2292
               </a>
-              <a href="mailto:info@fyrup.co.uk" className="flex items-center text-gray-400 hover:text-primary-600 transition-colors font-medium">
+              <a href="mailto:info@fyrup.co.uk" className="flex items-center text-gray-400 hover:text-[var(--primary)] transition-colors font-medium">
                 <Mail className="h-5 w-5 mr-2" />
                 info@fyrup.co.uk
               </a>
@@ -34,30 +34,30 @@ export default function Footer() {
 
           {/* Quick Links */}
           <div>
-            <h3 className="text-lg font-bold mb-6 uppercase tracking-wide border-b-2 border-primary-600 pb-2">Quick Links</h3>
+            <h3 className="text-lg font-bold mb-6 uppercase tracking-wide border-b-2 border-[var(--primary)] pb-2">Quick Links</h3>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link href="/" className="text-gray-400 hover:text-primary-600 transition-colors font-medium">
+                <Link href="/" className="text-gray-400 hover:text-[var(--primary)] transition-colors font-medium">
                   Home
                 </Link>
               </li>
               <li>
-                <Link href="/about/values" className="text-gray-400 hover:text-primary-600 transition-colors font-medium">
+                <Link href="/about/values" className="text-gray-400 hover:text-[var(--primary)] transition-colors font-medium">
                   Our Values
                 </Link>
               </li>
               <li>
-                <Link href="/about/guarantee" className="text-gray-400 hover:text-primary-600 transition-colors font-medium">
+                <Link href="/about/guarantee" className="text-gray-400 hover:text-[var(--primary)] transition-colors font-medium">
                   Our Guarantee
                 </Link>
               </li>
               <li>
-                <Link href="/contact" className="text-gray-400 hover:text-primary-600 transition-colors font-medium">
+                <Link href="/contact" className="text-gray-400 hover:text-[var(--primary)] transition-colors font-medium">
                   Contact
                 </Link>
               </li>
               <li>
-                <Link href="/faqs" className="text-gray-400 hover:text-primary-600 transition-colors font-medium">
+                <Link href="/faqs" className="text-gray-400 hover:text-[var(--primary)] transition-colors font-medium">
                   FAQs
                 </Link>
               </li>
@@ -66,25 +66,25 @@ export default function Footer() {
 
           {/* Services */}
           <div>
-            <h3 className="text-lg font-bold mb-6 uppercase tracking-wide border-b-2 border-primary-600 pb-2">Services</h3>
+            <h3 className="text-lg font-bold mb-6 uppercase tracking-wide border-b-2 border-[var(--primary)] pb-2">Services</h3>
             <ul className="space-y-3 text-sm">
               <li>
-                <Link href="/services/fire-risk-assessments" className="text-gray-400 hover:text-primary-600 transition-colors font-medium">
+                <Link href="/services/fire-risk-assessments" className="text-gray-400 hover:text-[var(--primary)] transition-colors font-medium">
                   Fire Risk Assessments
                 </Link>
               </li>
               <li>
-                <Link href="/services/fire-stopping" className="text-gray-400 hover:text-primary-600 transition-colors font-medium">
+                <Link href="/services/fire-stopping" className="text-gray-400 hover:text-[var(--primary)] transition-colors font-medium">
                   Fire Stopping
                 </Link>
               </li>
               <li>
-                <Link href="/services/fire-doors" className="text-gray-400 hover:text-primary-600 transition-colors font-medium">
+                <Link href="/services/fire-doors" className="text-gray-400 hover:text-[var(--primary)] transition-colors font-medium">
                   Fire Doors
                 </Link>
               </li>
               <li>
-                <Link href="/services/fire-dampers" className="text-gray-400 hover:text-primary-600 transition-colors font-medium">
+                <Link href="/services/fire-dampers" className="text-gray-400 hover:text-[var(--primary)] transition-colors font-medium">
                   Fire Dampers
                 </Link>
               </li>
@@ -93,17 +93,17 @@ export default function Footer() {
 
           {/* Newsletter */}
           <div>
-            <h3 className="text-lg font-bold mb-6 uppercase tracking-wide border-b-2 border-primary-600 pb-2">Stay Updated</h3>
+            <h3 className="text-lg font-bold mb-6 uppercase tracking-wide border-b-2 border-[var(--primary)] pb-2">Stay Updated</h3>
             <p className="text-gray-400 mb-4 text-sm font-medium">Subscribe to our newsletter for fire safety tips and updates.</p>
             <form className="space-y-3">
               <input
                 type="email"
                 placeholder="Your email"
-                className="w-full px-4 py-3 bg-dark-800 border-2 border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-primary-600 text-sm font-medium"
+                className="w-full px-4 py-3 bg-dark-800 border-2 border-gray-700 text-white placeholder-gray-500 focus:outline-none focus:border-[var(--primary)] text-sm font-medium"
               />
               <button
                 type="submit"
-                className="w-full bg-primary-600 text-white px-6 py-3 font-bold uppercase tracking-wide hover:bg-primary-700 transition-colors text-sm"
+                className="w-full bg-[var(--primary)] text-white px-6 py-3 font-bold uppercase tracking-wide hover:bg-[var(--primary-hover)] transition-colors text-sm"
               >
                 Subscribe
               </button>
