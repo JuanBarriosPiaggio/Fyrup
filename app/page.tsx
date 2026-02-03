@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Shield, FileCheck, DoorClosed, Wind, Phone, Mail, MapPin, ArrowRight, CheckCircle } from 'lucide-react';
+import AccreditationBanner from '@/components/AccreditationBanner';
 
 export default function Home() {
   return (
@@ -85,6 +86,11 @@ export default function Home() {
               </div>
             </div>
           </div>
+        </div>
+        
+        {/* Accreditations Rolling Banner */}
+        <div className="absolute bottom-0 left-0 right-0 z-10">
+          <AccreditationBanner />
         </div>
       </section>
 

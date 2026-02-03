@@ -90,6 +90,9 @@ export default function Header() {
               </div>
             </div>
 
+            <Link href="/insurance" className="text-white hover:text-[var(--accent)] transition-colors text-sm font-semibold uppercase tracking-wide">
+              Insurance
+            </Link>
             <Link href="/contact" className="text-white hover:text-[var(--accent)] transition-colors text-sm font-semibold uppercase tracking-wide">
               Contact
             </Link>
@@ -156,6 +159,9 @@ export default function Header() {
               </Link>
             </div>
 
+            <Link href="/insurance" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white hover:text-[var(--accent)] font-semibold uppercase">
+              Insurance
+            </Link>
             <Link href="/contact" onClick={() => setMobileMenuOpen(false)} className="block py-2 text-white hover:text-[var(--accent)] font-semibold uppercase">
               Contact
             </Link>
