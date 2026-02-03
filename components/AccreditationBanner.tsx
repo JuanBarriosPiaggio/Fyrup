@@ -7,6 +7,7 @@ const accreditations = [
   { src: '/acred/Bluesky Inspector Logo - No Website.jpg', alt: 'Bluesky Inspector' },
   { src: '/acred/Fyrup_LtdFDInsp_UKASlogo.png', alt: 'UKAS Accredited' },
   { src: '/acred/IFE_Affiliate Organisation_2025.png', alt: 'IFE Affiliate Organisation 2025' },
+  { src: '/acred/NAPFIS-ISO-PORTRAIT-1.png', alt: 'NAPFIS ISO Certification' },
 ];
 
 export default function AccreditationBanner() {
@@ -14,7 +15,7 @@ export default function AccreditationBanner() {
     <div className="w-full py-8 bg-white/5 backdrop-blur-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Static grid layout */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-8 items-center justify-items-center">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6 md:gap-8 items-center justify-items-center">
           {accreditations.map((accred, index) => (
             <div
               key={index}

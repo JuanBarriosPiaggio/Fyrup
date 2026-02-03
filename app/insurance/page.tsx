@@ -20,18 +20,6 @@ const insuranceDocs = [
     description: 'Additional excess cover for professional indemnity',
     expires: '14 March 2026',
   },
-  {
-    title: 'NAPFIS ISO Certification (Landscape)',
-    filename: 'NAPFIS-ISO-LANDSCAPE.pdf',
-    description: 'ISO certification documentation - landscape format',
-    expires: 'Current',
-  },
-  {
-    title: 'NAPFIS ISO Certification (Portrait)',
-    filename: 'NAPFIS-ISO-PORTRAIT.pdf',
-    description: 'ISO certification documentation - portrait format',
-    expires: 'Current',
-  },
 ];
 
 export const metadata = {
