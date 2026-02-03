@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { Menu, X, ChevronDown } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 
@@ -27,15 +28,21 @@ export default function Header() {
         <div className="flex items-center justify-between h-20">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-3">
-            <img
+            <Image
               src="/logo.png"
               alt="Fyrup Logo"
+              width={64}
+              height={64}
               className="h-16 w-auto"
+              priority
             />
-            <img
+            <Image
               src="/Wording.png"
               alt="Fyrup"
+              width={120}
+              height={32}
               className="h-8 w-auto"
+              priority
             />
           </Link>
 
