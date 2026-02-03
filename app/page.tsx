@@ -6,7 +6,7 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section - Bold Contractor Style */}
-      <section className="relative min-h-screen flex items-center px-4 sm:px-6 lg:px-8 pt-32 pb-20 bg-dark-900">
+      <section className="relative min-h-screen flex items-center px-4 sm:px-6 lg:px-8 pt-32 pb-48 md:pb-32 bg-dark-900">
         {/* Hero Background Image */}
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-dark-900/85"></div>
@@ -56,7 +56,7 @@ export default function Home() {
             </div>
 
             {/* Features Bar */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8 border-t-4 border-[var(--primary)]">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8 mb-32 md:mb-0 border-t-4 border-[var(--primary)]">
               <div className="flex items-center gap-3">
                 <div className="bg-[var(--primary)] p-3">
                   <CheckCircle className="h-8 w-8 text-white" />
