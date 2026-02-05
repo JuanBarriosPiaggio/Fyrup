@@ -17,13 +17,16 @@ curl https://your-app.railway.app/api/init
 ## 🔌 API Quick Reference
 
 ```bash
-# Get current count (fast)
+# Get customer count (fast)
 GET /api/simpro/customers
+
+# Get jobs completed count (fast)
+GET /api/simpro/jobs/completed
 
 # Check status
 GET /api/simpro/customers/refresh
 
-# Trigger refresh (background job)
+# Trigger refresh (background job - refreshes both metrics)
 POST /api/simpro/customers/refresh
 
 # Initialize on startup
@@ -60,12 +63,15 @@ curl -X POST https://your-app.railway.app/api/simpro/customers/refresh
 
 ```typescript
 // Change refresh interval in lib/redis.ts:
-export const CUSTOMER_COUNT_TTL = 6 * 60 * 60; // 6 hours
+export const CACHE_TTL = 6 * 60 * 60; // 6 hours
 
 // Redis keys used:
-fyrup:customer_count          // The count
-fyrup:customer_count_updated  // Last update timestamp
-fyrup:customer_count_lock     // Concurrent refresh lock
+fyrup:customer_count             // Customer count
+fyrup:customer_count_updated     // Customer last update
+fyrup:customer_count_lock        // Customer refresh lock
+fyrup:jobs_completed_count       // Jobs completed count
+fyrup:jobs_completed_count_updated  // Jobs last update
+fyrup:jobs_completed_count_lock  // Jobs refresh lock
 ```
 
 ## ⚠️ Troubleshooting
@@ -85,12 +91,12 @@ curl -X POST https://your-app.railway.app/api/simpro/customers/refresh
 
 ## 📊 What to Expect
 
-| Before | After |
-|--------|-------|
-| 2-3 seconds load | ~5ms load |
-| ~20% accurate | 100% accurate |
-| Resets on restart | Persists |
-| 500 invoices | ALL invoices |
+| Metric | Before | After |
+|--------|--------|-------|
+| Customer Count | 2-3s load, ~20% accurate | ~5ms load, 100% accurate |
+| Jobs Completed | Not displayed | ~5ms load, 100% accurate |
+| Data Persistence | Resets on restart | Persists in Redis |
+| Refresh | Manual only | Auto every 6 hours |
 
 ## 📚 Full Documentation
 
