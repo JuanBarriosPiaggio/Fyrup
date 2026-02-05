@@ -64,16 +64,20 @@ $env:TEST_URL = "https://your-app.railway.app"
 
 ## 📅 Automated Refresh (Already Set Up!)
 
-✅ **A GitHub Actions workflow is already configured** to refresh the customer count every 6 hours automatically.
+✅ **An in-app cron job is already configured** to refresh the customer count every 6 hours automatically.
 
-**Location:** `.github/workflows/refresh-customer-count.yml`
+**Implementation:** 
+- `lib/customer-count-cron.ts` - Cron job logic
+- `instrumentation.ts` - Starts cron on app boot
 
 **Schedule:** Runs at 00:00, 06:00, 12:00, and 18:00 UTC (every 6 hours)
 
-**Manual Trigger:** You can also trigger it manually from:
-- GitHub → Actions tab → "Refresh Customer Count" → "Run workflow"
+**Manual Trigger:** Call the refresh endpoint:
+```bash
+curl -X POST https://your-app.railway.app/api/simpro/customers/refresh
+```
 
-No additional setup needed! The cron job will start running automatically after deployment.
+No additional setup needed! The cron job starts automatically when the app boots.
 
 ## 🔧 Without Redis (Fallback Mode)
 

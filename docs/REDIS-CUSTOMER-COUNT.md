@@ -204,24 +204,25 @@ curl -X GET https://your-app.railway.app/api/init
 
 This will check Redis and trigger a background refresh if empty.
 
-### Step 4: Set Up Automated Refresh
+### Step 4: Automated Refresh (Already Set Up!)
 
-**Option A: Cron Job (Recommended)**
+✅ **The app includes an in-app cron job** that automatically refreshes the customer count every 6 hours.
 
-Use a service like [cron-job.org](https://cron-job.org) or Railway's cron add-on:
+**How it works:**
+- Cron job starts automatically when the app boots (`instrumentation.ts`)
+- Runs at 00:00, 06:00, 12:00, and 18:00 UTC
+- Also runs once 5 seconds after startup (initial refresh)
+- Implementation: `lib/customer-count-cron.ts`
 
-```bash
-# Run every 6 hours
-0 */6 * * * curl -X POST https://your-app.railway.app/api/simpro/customers/refresh
-```
+**Manual Trigger (optional):**
 
-**Option B: Manual Trigger**
-
-You can manually trigger a refresh anytime:
+You can also manually trigger a refresh anytime:
 
 ```bash
 curl -X POST https://your-app.railway.app/api/simpro/customers/refresh
 ```
+
+**Note:** If the app restarts, it may miss a scheduled run, but will automatically run on next boot and continue the 6-hour schedule.
 
 ## Testing Locally
 
