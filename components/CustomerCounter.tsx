@@ -23,52 +23,48 @@ function formatCustomerCount(count: number): string {
 }
 
 export default function CustomerCounter() {
-  const [count, setCount] = useState<string>('100+'); // Show placeholder immediately
+  const [displayCount, setDisplayCount] = useState<number>(0);
+  const [targetCount, setTargetCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     let isMounted = true;
-
+    
     async function fetchCustomerCount() {
       try {
         const response = await fetch('/api/simpro/customers', {
           cache: 'no-store' // Don't cache on client side, Redis handles server-side caching
         });
-
+        
         if (!response.ok) {
           throw new Error('Failed to fetch customer count');
         }
-
+        
         const data = await response.json();
-
+        
         // If Redis needs refresh, the API will return needsRefresh: true
-        // In this case, we show the placeholder and optionally retry after a delay
         if (data.needsRefresh) {
           console.log('Customer count cache is being populated, will retry in 10 seconds...');
-
+          
           // Retry after 10 seconds to get the refreshed count
           setTimeout(() => {
             if (isMounted) {
               fetchCustomerCount();
             }
           }, 10000);
-
-          // Keep showing placeholder while refresh is in progress
+          
           if (isMounted) {
             setIsLoading(false);
           }
           return;
         }
-
-        const formattedCount = formatCustomerCount(data.count);
-
+        
         if (isMounted) {
-          setCount(formattedCount);
+          setTargetCount(data.count);
           setIsLoading(false);
         }
       } catch (error) {
         console.error('Error fetching customer count:', error);
-        // Keep the placeholder if API fails
         if (isMounted) {
           setIsLoading(false);
         }
@@ -76,12 +72,35 @@ export default function CustomerCounter() {
     }
 
     fetchCustomerCount();
-
+    
     // Cleanup function to prevent state updates on unmounted component
     return () => {
       isMounted = false;
     };
-  }, []); // Empty dependency array ensures this only runs once
+  }, []);
+
+  // Count up animation
+  useEffect(() => {
+    if (targetCount === 0) return;
+
+    const duration = 2000; // 2 seconds
+    const steps = 60; // 60 steps for smooth animation
+    const increment = targetCount / steps;
+    const stepDuration = duration / steps;
+    let currentStep = 0;
+
+    const timer = setInterval(() => {
+      currentStep++;
+      if (currentStep >= steps) {
+        setDisplayCount(targetCount);
+        clearInterval(timer);
+      } else {
+        setDisplayCount(Math.floor(increment * currentStep));
+      }
+    }, stepDuration);
+
+    return () => clearInterval(timer);
+  }, [targetCount]);
 
   return (
     <div className="flex items-center gap-3">
@@ -91,7 +110,7 @@ export default function CustomerCounter() {
       <div>
         <div className={`text-white font-bold text-lg transition-opacity duration-500 ${isLoading ? 'opacity-70' : 'opacity-100'
           }`}>
-          {count}
+          {formatCustomerCount(displayCount)}
         </div>
         <div className="text-gray-400">Clients Served</div>
       </div>

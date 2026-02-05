@@ -23,7 +23,8 @@ function formatJobsCount(count: number): string {
 }
 
 export default function JobsCounter() {
-  const [count, setCount] = useState<string>('100+'); // Show placeholder immediately
+  const [displayCount, setDisplayCount] = useState<number>(0);
+  const [targetCount, setTargetCount] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -52,22 +53,18 @@ export default function JobsCounter() {
             }
           }, 10000);
           
-          // Keep showing placeholder while refresh is in progress
           if (isMounted) {
             setIsLoading(false);
           }
           return;
         }
         
-        const formattedCount = formatJobsCount(data.count);
-        
         if (isMounted) {
-          setCount(formattedCount);
+          setTargetCount(data.count);
           setIsLoading(false);
         }
       } catch (error) {
         console.error('Error fetching jobs count:', error);
-        // Keep the placeholder if API fails
         if (isMounted) {
           setIsLoading(false);
         }
@@ -80,7 +77,30 @@ export default function JobsCounter() {
     return () => {
       isMounted = false;
     };
-  }, []); // Empty dependency array ensures this only runs once
+  }, []);
+
+  // Count up animation
+  useEffect(() => {
+    if (targetCount === 0) return;
+
+    const duration = 2000; // 2 seconds
+    const steps = 60; // 60 steps for smooth animation
+    const increment = targetCount / steps;
+    const stepDuration = duration / steps;
+    let currentStep = 0;
+
+    const timer = setInterval(() => {
+      currentStep++;
+      if (currentStep >= steps) {
+        setDisplayCount(targetCount);
+        clearInterval(timer);
+      } else {
+        setDisplayCount(Math.floor(increment * currentStep));
+      }
+    }, stepDuration);
+
+    return () => clearInterval(timer);
+  }, [targetCount]);
 
   return (
     <div className="flex items-center gap-3">
@@ -88,10 +108,9 @@ export default function JobsCounter() {
         <Briefcase className="h-8 w-8 text-white" />
       </div>
       <div>
-        <div className={`text-white font-bold text-lg transition-opacity duration-500 ${
-          isLoading ? 'opacity-70' : 'opacity-100'
-        }`}>
-          {count}
+        <div className={`text-white font-bold text-lg transition-opacity duration-500 ${isLoading ? 'opacity-70' : 'opacity-100'
+          }`}>
+          {formatJobsCount(displayCount)}
         </div>
         <div className="text-gray-400">Jobs Completed</div>
       </div>
