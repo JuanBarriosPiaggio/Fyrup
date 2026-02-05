@@ -30,32 +30,48 @@ export async function GET() {
     
     // Since the /customers/ endpoint isn't available, we'll derive unique customers from invoices
     // This gives us a count of "customers who have been invoiced" which is meaningful
-    const response = await fetch(
-      `${SIMPRO_API_URL}/companies/${COMPANY_ID}/invoices/?pageSize=1000`,
-      {
-        headers: {
-          'Authorization': `Bearer ${SIMPRO_TOKEN}`,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        cache: 'no-store'
-      }
-    );
-
-    if (!response.ok) {
-      throw new Error(`Simpro API error: ${response.status} ${response.statusText}`);
-    }
-
-    const invoices = await response.json();
+    // Note: Simpro API has a maximum pageSize of 250 according to swagger, so we need pagination
     
-    // Count unique customers from invoices
     const uniqueCustomerIds = new Set();
-    if (Array.isArray(invoices)) {
-      invoices.forEach((invoice: any) => {
-        if (invoice.Customer && invoice.Customer.ID) {
-          uniqueCustomerIds.add(invoice.Customer.ID);
+    let page = 1;
+    let hasMorePages = true;
+    
+    while (hasMorePages) {
+      const response = await fetch(
+        `${SIMPRO_API_URL}/companies/${COMPANY_ID}/invoices/?pageSize=250&page=${page}&columns=ID,Customer`,
+        {
+          headers: {
+            'Authorization': `Bearer ${SIMPRO_TOKEN}`,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          cache: 'no-store'
         }
-      });
+      );
+
+      if (!response.ok) {
+        throw new Error(`Simpro API error: ${response.status} ${response.statusText}`);
+      }
+
+      const invoices = await response.json();
+      
+      // Count unique customers from this page
+      if (Array.isArray(invoices)) {
+        invoices.forEach((invoice: any) => {
+          if (invoice.Customer && invoice.Customer.ID) {
+            uniqueCustomerIds.add(invoice.Customer.ID);
+          }
+        });
+        
+        // If we got less than 250 results, we've reached the last page
+        if (invoices.length < 250) {
+          hasMorePages = false;
+        } else {
+          page++;
+        }
+      } else {
+        hasMorePages = false;
+      }
     }
     
     const customerCount = uniqueCustomerIds.size;
