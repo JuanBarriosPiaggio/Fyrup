@@ -16,7 +16,7 @@ export async function GET() {
     if (cachedCount !== null && cacheTimestamp !== null) {
       const cacheAge = now - cacheTimestamp;
       if (cacheAge < CACHE_DURATION) {
-        console.log(`Returning cached customer count: ${cachedCount} (age: ${Math.round(cacheAge / 1000 / 60)} minutes)`);
+        console.log(`💾 Returning cached customer count: ${cachedCount} unique customers (cache age: ${Math.round(cacheAge / 1000 / 60)} minutes)`);
         return NextResponse.json({ 
           count: cachedCount,
           cached: true,
@@ -26,7 +26,7 @@ export async function GET() {
     }
 
     // Fetch fresh data from Simpro API
-    console.log('Fetching customer count from invoices...');
+    console.log('🔄 Fetching customer count from invoices...');
     
     // Since the /customers/ endpoint isn't available, we'll derive unique customers from invoices
     // This gives us a count of "customers who have been invoiced" which is meaningful
@@ -35,8 +35,11 @@ export async function GET() {
     const uniqueCustomerIds = new Set();
     let page = 1;
     let hasMorePages = true;
+    let totalInvoices = 0;
     
     while (hasMorePages) {
+      console.log(`  📄 Fetching page ${page}...`);
+      
       const response = await fetch(
         `${SIMPRO_API_URL}/companies/${COMPANY_ID}/invoices/?pageSize=250&page=${page}&columns=ID,Customer`,
         {
@@ -57,11 +60,15 @@ export async function GET() {
       
       // Count unique customers from this page
       if (Array.isArray(invoices)) {
+        totalInvoices += invoices.length;
+        
         invoices.forEach((invoice: any) => {
           if (invoice.Customer && invoice.Customer.ID) {
             uniqueCustomerIds.add(invoice.Customer.ID);
           }
         });
+        
+        console.log(`  ✓ Page ${page}: ${invoices.length} invoices, ${uniqueCustomerIds.size} unique customers so far`);
         
         // If we got less than 250 results, we've reached the last page
         if (invoices.length < 250) {
@@ -80,7 +87,24 @@ export async function GET() {
     cachedCount = customerCount;
     cacheTimestamp = now;
 
-    console.log(`Fresh customer count fetched: ${customerCount}`);
+    console.log(`✅ TOTAL: ${totalInvoices} invoices processed → ${customerCount} unique customers found`);
+    console.log(`   Display will show: "${formatCustomerCount(customerCount)}"`);
+    
+    // Helper function to show what will be displayed
+    function formatCustomerCount(count: number): string {
+      if (count >= 1000) {
+        const thousands = Math.floor(count / 100) * 100;
+        return `${(thousands / 1000).toFixed(0)}k+`;
+      } else if (count >= 100) {
+        const hundreds = Math.floor(count / 100) * 100;
+        return `${hundreds}+`;
+      } else if (count >= 50) {
+        const rounded = Math.floor(count / 50) * 50;
+        return `${rounded}+`;
+      } else {
+        return `${count}+`;
+      }
+    }
 
     return NextResponse.json({ 
       count: customerCount,
@@ -92,7 +116,7 @@ export async function GET() {
     
     // If we have a cached count, return it even if expired
     if (cachedCount !== null) {
-      console.log('API error, returning stale cached count');
+      console.log(`⚠️  API error, returning stale cached count: ${cachedCount} unique customers`);
       return NextResponse.json({ 
         count: cachedCount,
         cached: true,
