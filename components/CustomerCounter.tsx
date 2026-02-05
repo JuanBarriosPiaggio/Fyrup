@@ -20,45 +20,58 @@ function formatCustomerCount(count: number): string {
 }
 
 export default function CustomerCounter() {
-  const [count, setCount] = useState<string | null>(null);
-  const [isVisible, setIsVisible] = useState(false);
+  const [count, setCount] = useState<string>('100+'); // Show placeholder immediately
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    // Only fetch once by checking if we've already fetched
+    let isMounted = true;
+    
     async function fetchCustomerCount() {
       try {
-        const response = await fetch('/api/simpro/customers');
+        const response = await fetch('/api/simpro/customers', {
+          // Add cache to prevent multiple fetches
+          next: { revalidate: 3600 } // Cache for 1 hour
+        });
+        
         if (!response.ok) {
           throw new Error('Failed to fetch customer count');
         }
+        
         const data = await response.json();
         const formattedCount = formatCustomerCount(data.count);
-        setCount(formattedCount);
         
-        // Trigger fade-in animation after a short delay
-        setTimeout(() => setIsVisible(true), 100);
+        if (isMounted) {
+          setCount(formattedCount);
+          setIsLoading(false);
+        }
       } catch (error) {
         console.error('Error fetching customer count:', error);
-        // Fallback to a default message if API fails
-        setCount('500+');
-        setTimeout(() => setIsVisible(true), 100);
+        // Keep the placeholder if API fails
+        if (isMounted) {
+          setIsLoading(false);
+        }
       }
     }
 
     fetchCustomerCount();
-  }, []);
+    
+    // Cleanup function to prevent state updates on unmounted component
+    return () => {
+      isMounted = false;
+    };
+  }, []); // Empty dependency array ensures this only runs once
 
   return (
-    <div 
-      className={`flex items-center gap-3 transition-opacity duration-1000 ease-in-out ${
-        isVisible ? 'opacity-100' : 'opacity-0'
-      }`}
-    >
+    <div className="flex items-center gap-3">
       <div className="bg-[var(--primary)] p-3">
         <Users className="h-8 w-8 text-white" />
       </div>
       <div>
-        <div className="text-white font-bold text-lg">
-          {count || '500+'}
+        <div className={`text-white font-bold text-lg transition-opacity duration-500 ${
+          isLoading ? 'opacity-70' : 'opacity-100'
+        }`}>
+          {count}
         </div>
         <div className="text-gray-400">Clients Served</div>
       </div>

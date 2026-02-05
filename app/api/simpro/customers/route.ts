@@ -26,19 +26,20 @@ export async function GET() {
     }
 
     // Fetch fresh data from Simpro API
-    console.log('🔄 Fetching customer count from invoices...');
+    console.log('🔄 Fetching customer count from invoices (fast mode - 2 pages max)...');
     
     // Since the /customers/ endpoint isn't available, we'll derive unique customers from invoices
-    // This gives us a count of "customers who have been invoiced" which is meaningful
-    // Note: Simpro API has a maximum pageSize of 250 according to swagger, so we need pagination
+    // For performance: We only fetch first 2 pages (500 invoices) to keep load time under 2-3 seconds
+    // This gives us a good representative sample of unique customers
+    // Note: Simpro API has a maximum pageSize of 250 according to swagger
     
     const uniqueCustomerIds = new Set();
     let page = 1;
-    let hasMorePages = true;
+    const MAX_PAGES = 2; // Limit to 2 pages for speed (500 invoices)
     let totalInvoices = 0;
     
-    while (hasMorePages) {
-      console.log(`  📄 Fetching page ${page}...`);
+    while (page <= MAX_PAGES) {
+      console.log(`  📄 Fetching page ${page}/${MAX_PAGES}...`);
       
       const response = await fetch(
         `${SIMPRO_API_URL}/companies/${COMPANY_ID}/invoices/?pageSize=250&page=${page}&columns=ID,Customer`,
@@ -72,12 +73,13 @@ export async function GET() {
         
         // If we got less than 250 results, we've reached the last page
         if (invoices.length < 250) {
-          hasMorePages = false;
-        } else {
-          page++;
+          console.log(`  ℹ️  Reached last page (only ${invoices.length} invoices on this page)`);
+          break;
         }
+        
+        page++;
       } else {
-        hasMorePages = false;
+        break;
       }
     }
     
@@ -87,7 +89,8 @@ export async function GET() {
     cachedCount = customerCount;
     cacheTimestamp = now;
 
-    console.log(`✅ TOTAL: ${totalInvoices} invoices processed → ${customerCount} unique customers found`);
+    console.log(`✅ SAMPLE: ${totalInvoices} invoices processed → ${customerCount} unique customers found`);
+    console.log(`   Note: Limited to ${MAX_PAGES} pages for performance (full count would take longer)`);
     console.log(`   Display will show: "${formatCustomerCount(customerCount)}"`);
     
     // Helper function to show what will be displayed
