@@ -6,8 +6,11 @@ import { Users } from 'lucide-react';
 // Round the customer count to a nice display number
 function formatCustomerCount(count: number): string {
   if (count >= 1000) {
-    const thousands = Math.floor(count / 100) * 100;
-    return `${(thousands / 1000).toFixed(0)}k+`;
+    // Show as "1.5k+" for better accuracy
+    const thousands = (count / 1000).toFixed(1);
+    // Remove ".0" if it's a round number (e.g., "2.0k" becomes "2k")
+    const formatted = thousands.endsWith('.0') ? thousands.slice(0, -2) : thousands;
+    return `${formatted}k+`;
   } else if (count >= 100) {
     const hundreds = Math.floor(count / 100) * 100;
     return `${hundreds}+`;
