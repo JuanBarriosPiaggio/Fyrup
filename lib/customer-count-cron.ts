@@ -167,9 +167,11 @@ async function refreshJobsCount() {
       if (Array.isArray(jobs) && jobs.length > 0) {
         totalJobs += jobs.length;
 
-        // Count jobs with Status "Complete"
+        // Count jobs with Status.Name "Job : Completed"
+        // Also count "Invoices : Fully-paid" as these are completed and invoiced
         jobs.forEach((job: any) => {
-          if (job.Status === 'Complete') {
+          const statusName = job.Status?.Name || '';
+          if (statusName === 'Job : Completed' || statusName === 'Invoices : Fully-paid') {
             completedJobs++;
           }
         });
