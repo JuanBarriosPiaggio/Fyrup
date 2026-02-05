@@ -47,15 +47,23 @@ export function getRedisClient(): Redis | null {
 }
 
 /**
- * Customer count cache keys
+ * Cache keys for Redis
  */
 export const REDIS_KEYS = {
   CUSTOMER_COUNT: 'fyrup:customer_count',
   CUSTOMER_COUNT_UPDATED: 'fyrup:customer_count_updated',
   CUSTOMER_COUNT_LOCK: 'fyrup:customer_count_lock',
+  JOBS_COUNT: 'fyrup:jobs_completed_count',
+  JOBS_COUNT_UPDATED: 'fyrup:jobs_completed_count_updated',
+  JOBS_COUNT_LOCK: 'fyrup:jobs_completed_count_lock',
 } as const;
 
 /**
- * TTL for customer count cache: 6 hours
+ * TTL for cache: 6 hours
  */
-export const CUSTOMER_COUNT_TTL = 6 * 60 * 60; // 6 hours in seconds
+export const CACHE_TTL = 6 * 60 * 60; // 6 hours in seconds
+
+/**
+ * Legacy export for backward compatibility
+ */
+export const CUSTOMER_COUNT_TTL = CACHE_TTL;

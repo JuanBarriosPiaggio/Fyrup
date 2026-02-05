@@ -2,6 +2,7 @@ import Link from 'next/link';
 import { Shield, FileCheck, DoorClosed, Wind, Phone, Mail, MapPin, ArrowRight, CheckCircle } from 'lucide-react';
 import AccreditationBanner from '@/components/AccreditationBanner';
 import CustomerCounter from '@/components/CustomerCounter';
+import JobsCounter from '@/components/JobsCounter';
 
 export default function Home() {
   return (
@@ -76,16 +77,8 @@ export default function Home() {
                   <div className="text-gray-400">Experience</div>
                 </div>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="bg-[var(--primary)] p-3">
-                  <CheckCircle className="h-8 w-8 text-white" />
-                </div>
-                <div>
-                  <div className="text-white font-bold text-lg">Certified</div>
-                  <div className="text-gray-400">Professionals</div>
-                </div>
-              </div>
               <CustomerCounter />
+              <JobsCounter />
             </div>
           </div>
         </div>
