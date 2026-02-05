@@ -28,10 +28,9 @@ export async function GET() {
     // Fetch fresh data from Simpro API
     console.log('Fetching fresh customer count from Simpro API...');
     
-    // Try to get customers list with minimal data
-    // We just need the count, so we'll use pageSize=1 and check the total
+    // Fetch customers without the columns parameter (it's not supported)
     const response = await fetch(
-      `${SIMPRO_API_URL}/companies/${COMPANY_ID}/customers/?pageSize=1&columns=ID`,
+      `${SIMPRO_API_URL}/companies/${COMPANY_ID}/customers/?pageSize=1000`,
       {
         headers: {
           'Authorization': `Bearer ${SIMPRO_TOKEN}`,
@@ -47,28 +46,7 @@ export async function GET() {
     }
 
     const data = await response.json();
-    
-    // The response should be an array, we'll get the length
-    // If Simpro returns pagination info in headers, we could use that instead
-    // For now, we'll fetch all customers but only get their IDs (minimal data)
-    const fullResponse = await fetch(
-      `${SIMPRO_API_URL}/companies/${COMPANY_ID}/customers/?pageSize=1000&columns=ID`,
-      {
-        headers: {
-          'Authorization': `Bearer ${SIMPRO_TOKEN}`,
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        cache: 'no-store'
-      }
-    );
-
-    if (!fullResponse.ok) {
-      throw new Error(`Simpro API error: ${fullResponse.status} ${fullResponse.statusText}`);
-    }
-
-    const fullData = await fullResponse.json();
-    const customerCount = Array.isArray(fullData) ? fullData.length : 0;
+    const customerCount = Array.isArray(data) ? data.length : 0;
 
     // Update cache
     cachedCount = customerCount;
