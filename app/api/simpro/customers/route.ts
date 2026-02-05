@@ -26,11 +26,12 @@ export async function GET() {
     }
 
     // Fetch fresh data from Simpro API
-    console.log('Fetching fresh customer count from Simpro API...');
+    console.log('Fetching customer count from invoices...');
     
-    // Fetch customers without the columns parameter (it's not supported)
+    // Since the /customers/ endpoint isn't available, we'll derive unique customers from invoices
+    // This gives us a count of "customers who have been invoiced" which is meaningful
     const response = await fetch(
-      `${SIMPRO_API_URL}/companies/${COMPANY_ID}/customers/?pageSize=1000`,
+      `${SIMPRO_API_URL}/companies/${COMPANY_ID}/invoices/?pageSize=1000&columns=ID,Customer`,
       {
         headers: {
           'Authorization': `Bearer ${SIMPRO_TOKEN}`,
@@ -45,8 +46,19 @@ export async function GET() {
       throw new Error(`Simpro API error: ${response.status} ${response.statusText}`);
     }
 
-    const data = await response.json();
-    const customerCount = Array.isArray(data) ? data.length : 0;
+    const invoices = await response.json();
+    
+    // Count unique customers from invoices
+    const uniqueCustomerIds = new Set();
+    if (Array.isArray(invoices)) {
+      invoices.forEach((invoice: any) => {
+        if (invoice.Customer && invoice.Customer.ID) {
+          uniqueCustomerIds.add(invoice.Customer.ID);
+        }
+      });
+    }
+    
+    const customerCount = uniqueCustomerIds.size;
 
     // Update cache
     cachedCount = customerCount;
