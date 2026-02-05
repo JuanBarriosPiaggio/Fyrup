@@ -31,7 +31,7 @@ export async function GET() {
     // Since the /customers/ endpoint isn't available, we'll derive unique customers from invoices
     // This gives us a count of "customers who have been invoiced" which is meaningful
     const response = await fetch(
-      `${SIMPRO_API_URL}/companies/${COMPANY_ID}/invoices/?pageSize=1000&columns=ID,Customer`,
+      `${SIMPRO_API_URL}/companies/${COMPANY_ID}/invoices/?pageSize=1000`,
       {
         headers: {
           'Authorization': `Bearer ${SIMPRO_TOKEN}`,
