@@ -24,23 +24,41 @@ export default function CustomerCounter() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Only fetch once by checking if we've already fetched
     let isMounted = true;
-    
+
     async function fetchCustomerCount() {
       try {
         const response = await fetch('/api/simpro/customers', {
-          // Add cache to prevent multiple fetches
-          next: { revalidate: 3600 } // Cache for 1 hour
+          cache: 'no-store' // Don't cache on client side, Redis handles server-side caching
         });
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch customer count');
         }
-        
+
         const data = await response.json();
+
+        // If Redis needs refresh, the API will return needsRefresh: true
+        // In this case, we show the placeholder and optionally retry after a delay
+        if (data.needsRefresh) {
+          console.log('Customer count cache is being populated, will retry in 10 seconds...');
+
+          // Retry after 10 seconds to get the refreshed count
+          setTimeout(() => {
+            if (isMounted) {
+              fetchCustomerCount();
+            }
+          }, 10000);
+
+          // Keep showing placeholder while refresh is in progress
+          if (isMounted) {
+            setIsLoading(false);
+          }
+          return;
+        }
+
         const formattedCount = formatCustomerCount(data.count);
-        
+
         if (isMounted) {
           setCount(formattedCount);
           setIsLoading(false);
@@ -55,7 +73,7 @@ export default function CustomerCounter() {
     }
 
     fetchCustomerCount();
-    
+
     // Cleanup function to prevent state updates on unmounted component
     return () => {
       isMounted = false;
@@ -68,9 +86,8 @@ export default function CustomerCounter() {
         <Users className="h-8 w-8 text-white" />
       </div>
       <div>
-        <div className={`text-white font-bold text-lg transition-opacity duration-500 ${
-          isLoading ? 'opacity-70' : 'opacity-100'
-        }`}>
+        <div className={`text-white font-bold text-lg transition-opacity duration-500 ${isLoading ? 'opacity-70' : 'opacity-100'
+          }`}>
           {count}
         </div>
         <div className="text-gray-400">Clients Served</div>

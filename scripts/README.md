@@ -4,6 +4,21 @@ PowerShell scripts for testing Simpro API connectivity and workflow logic.
 
 ## Quick Test Scripts
 
+### Redis Customer Count Testing
+```powershell
+.\test-redis-customer-count.ps1
+
+# Or test production:
+$env:TEST_URL = "https://your-app.railway.app"
+.\test-redis-customer-count.ps1
+```
+Tests the Redis-based customer count system:
+- Checks current cached count
+- Verifies Redis connection
+- Tests refresh status endpoint
+- Optionally triggers manual refresh
+- Validates cache updates
+
 ### Quote Follow-up Testing
 ```powershell
 .\test-quote-followup.ps1
@@ -30,6 +45,7 @@ Tests the invoice follow-up workflow logic:
 
 | Script | Purpose |
 |--------|---------|
+| `test-redis-customer-count.ps1` | ✅ Test Redis customer count system |
 | `test-quote-followup.ps1` | ✅ Test quote follow-up logic |
 | `test-invoice-followup.ps1` | ✅ Test invoice follow-up logic |
 | `test-simpro-api.ps1` | Basic API connectivity test |
