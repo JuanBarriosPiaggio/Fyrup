@@ -1,6 +1,7 @@
 import Link from 'next/link';
 import { Shield, FileCheck, DoorClosed, Wind, Phone, Mail, MapPin, ArrowRight, CheckCircle } from 'lucide-react';
 import AccreditationBanner from '@/components/AccreditationBanner';
+import CustomerCounter from '@/components/CustomerCounter';
 
 export default function Home() {
   return (
@@ -56,7 +57,7 @@ export default function Home() {
             </div>
 
             {/* Features Bar */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8 mb-48 md:mb-0 border-t-4 border-[var(--primary)]">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 pt-8 mb-48 md:mb-0 border-t-4 border-[var(--primary)]">
               <div className="flex items-center gap-3">
                 <div className="bg-[var(--primary)] p-3">
                   <CheckCircle className="h-8 w-8 text-white" />
@@ -84,6 +85,7 @@ export default function Home() {
                   <div className="text-gray-400">Professionals</div>
                 </div>
               </div>
+              <CustomerCounter />
             </div>
           </div>
         </div>
