@@ -62,50 +62,18 @@ $env:TEST_URL = "https://your-app.railway.app"
 .\scripts\test-redis-customer-count.ps1
 ```
 
-## 📅 Set Up Automated Refresh (Every 6 Hours)
+## 📅 Automated Refresh (Already Set Up!)
 
-### Option 1: cron-job.org (Free)
+✅ **A GitHub Actions workflow is already configured** to refresh the customer count every 6 hours automatically.
 
-1. Go to [cron-job.org](https://cron-job.org/)
-2. Create account
-3. Create new cron job:
-   - **URL:** `https://your-app.railway.app/api/simpro/customers/refresh`
-   - **Method:** POST
-   - **Schedule:** Every 6 hours (`0 */6 * * *`)
+**Location:** `.github/workflows/refresh-customer-count.yml`
 
-### Option 2: Railway Cron (Coming Soon)
+**Schedule:** Runs at 00:00, 06:00, 12:00, and 18:00 UTC (every 6 hours)
 
-Railway is adding native cron support. When available:
+**Manual Trigger:** You can also trigger it manually from:
+- GitHub → Actions tab → "Refresh Customer Count" → "Run workflow"
 
-```yaml
-# railway.yml
-services:
-  web:
-    cron:
-      - schedule: "0 */6 * * *"
-        url: "/api/simpro/customers/refresh"
-        method: POST
-```
-
-### Option 3: GitHub Actions
-
-```yaml
-# .github/workflows/refresh-customer-count.yml
-name: Refresh Customer Count
-
-on:
-  schedule:
-    - cron: '0 */6 * * *'  # Every 6 hours
-  workflow_dispatch:  # Allow manual trigger
-
-jobs:
-  refresh:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Trigger Refresh
-        run: |
-          curl -X POST https://your-app.railway.app/api/simpro/customers/refresh
-```
+No additional setup needed! The cron job will start running automatically after deployment.
 
 ## 🔧 Without Redis (Fallback Mode)
 

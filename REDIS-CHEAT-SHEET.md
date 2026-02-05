@@ -47,13 +47,13 @@ curl https://your-app.railway.app/api/simpro/customers/refresh
 curl -X POST https://your-app.railway.app/api/simpro/customers/refresh
 ```
 
-## ⏰ Cron Job Setup (cron-job.org)
+## ⏰ Cron Job (Already Configured!)
 
-```
-URL: https://your-app.railway.app/api/simpro/customers/refresh
-Method: POST
-Schedule: 0 */6 * * *  (every 6 hours)
-```
+✅ **GitHub Actions workflow already set up!**
+
+- **File:** `.github/workflows/refresh-customer-count.yml`
+- **Schedule:** Every 6 hours (00:00, 06:00, 12:00, 18:00 UTC)
+- **Manual trigger:** GitHub → Actions → "Refresh Customer Count" → Run workflow
 
 ## 🔧 Configuration
 
@@ -103,7 +103,7 @@ curl -X POST https://your-app.railway.app/api/simpro/customers/refresh
 - [ ] `REDIS_URL` set in environment
 - [ ] App deployed
 - [ ] `/api/init` called after deployment
-- [ ] Cron job configured for 6-hour refresh
+- [x] Cron job configured for 6-hour refresh (GitHub Actions)
 - [ ] Test script passed
 - [ ] Frontend shows accurate count (not 100+)
 
